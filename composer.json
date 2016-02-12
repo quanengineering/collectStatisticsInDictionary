@@ -1,0 +1,16 @@
+{
+  "name": "vendor_name/package_name",
+  "description": "description_text",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "author's name",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+    "phpoffice/phpexcel": "1.8.1",
+    "imangazaliev/didom": "1.5.1"
+  }
+}

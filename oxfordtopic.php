@@ -3,30 +3,30 @@ require "vendor/autoload.php";
 
 use DiDom\Document;
 
-$homepage_url = 'http://www.oxfordlearnersdictionaries.com/topic/';
-$homepage = new Document($homepage_url, true);
+$homePageUrl = 'http://www.oxfordlearnersdictionaries.com/topic/';
+$homePage = new Document($homePageUrl, true);
 
 //create associative array to store name of subcategory - category
-$category_subcategory_name = array();
+$categorySubcategoryNames = array();
 $i = 0;
 $j = 0;
-foreach($homepage->find('#topic-list dd dl dt') as $element){
-    $category_name = $homepage->find('#topic-list dd dl dt')[$i]->text();
-    if($homepage->find('#topic-list dd dl')[$j]->text() == ''){
+foreach($homePage->find('#topic-list dd dl dt') as $element){
+    $categoryName = $homePage->find('#topic-list dd dl dt')[$i]->text();
+    if($homePage->find('#topic-list dd dl')[$j]->text() == ''){
         $j++;
     }
-    foreach($homepage->find('#topic-list dd dl')[$j]->find('dd ul li') as $subcategory){
-        $category_subcategory_name[$subcategory->text()] = $category_name;
+    foreach($homePage->find('#topic-list dd dl')[$j]->find('dd ul li') as $subcategory){
+        $categorySubcategoryNames[$subcategory->text()] = $categoryName;
     }
     $i++;
     $j++;
 }
 
 // get subcategory's url
-$subcategory_urls = array();
+$subcategoryUrls = array();
 
-foreach ($homepage->find('#topic-list dd dl dd ul li a') as $element) {
-    $subcategory_urls[] = $element->getAttribute('href');
+foreach ($homePage->find('#topic-list dd dl dd ul li a') as $element) {
+    $subcategoryUrls[] = $element->getAttribute('href');
 }
 //
 ////get word's url
@@ -61,13 +61,13 @@ $objPHPExcel->getActiveSheet()->setCellValue('D1', "Subject");
 
 // Add data to first sheet
 $objPHPExcel->setActiveSheetIndex(0);
-$count = 2;
-foreach ($subcategory_urls as $subcategory_url) {
-    $document = new Document($subcategory_url, true);
+$numberOfEntry = 2;
+foreach ($subcategoryUrls as $subcategoryUrl) {
+    $document = new Document($subcategoryUrl, true);
 
-    $subcategory_name = $document->find('.selected')[0]->text();
-    $category_name = $category_subcategory_name[$subcategory_name];
-    $subject_name = $document->find('.selected')[1]->text();
+    $subcategoryName = $document->find('.selected')[0]->text();
+    $categoryName = $categorySubcategoryNames[$subcategoryName];
+    $subjectName = $document->find('.selected')[1]->text();
 
 //    $word_urls = array();
 //
@@ -75,12 +75,12 @@ foreach ($subcategory_urls as $subcategory_url) {
 //        $word_urls[] = $element->getAttribute('href');
 //    }
 
-    foreach ($document->find('.wordpool li') as $word) {
-        $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, $word->text())
-                                    ->setCellValue('B' . $count, $subcategory_name)
-                                    ->setCellValue('C' . $count, $category_name)
-                                    ->setCellValue('D' . $count, $subject_name);
-        $count++;
+    foreach ($document->find('.wordpool li') as $entry) {
+        $objPHPExcel->getActiveSheet()->setCellValue('A' . $numberOfEntry, $entry->text())
+                                    ->setCellValue('B' . $numberOfEntry, $subcategoryName)
+                                    ->setCellValue('C' . $numberOfEntry, $categoryName)
+                                    ->setCellValue('D' . $numberOfEntry, $subjectName);
+        $numberOfEntry++;
     }
 
 //    foreach($word_urls as $word_url){
@@ -99,40 +99,41 @@ $objPHPExcel->createSheet();
 
 $objPHPExcel->setActiveSheetIndex(1);
 $objPHPExcel->getActiveSheet()->setCellValue('A1', "Subcategory");
-$objPHPExcel->getActiveSheet()->setCellValue('B1', "No.of words");
-$objPHPExcel->getActiveSheet()->setCellValue('C1', "Category");
-$objPHPExcel->getActiveSheet()->setCellValue('D1', "No.of words");
-$objPHPExcel->getActiveSheet()->setCellValue('E1', "Subject");
-$objPHPExcel->getActiveSheet()->setCellValue('F1', "No.of words");
+$objPHPExcel->getActiveSheet()->setCellValue('B1', "No.of entries");
+$objPHPExcel->getActiveSheet()->setCellValue('D1', "Category");
+$objPHPExcel->getActiveSheet()->setCellValue('E1', "No.of entries");
+$objPHPExcel->getActiveSheet()->setCellValue('G1', "Subject");
+$objPHPExcel->getActiveSheet()->setCellValue('H1', "No.of entries");
 
 //Add data to second sheet
 $objPHPExcel->setActiveSheetIndex(1);
 $count = 2;
-foreach($homepage->find('#topic-list dd dl dd ul li') as $subcategory){
+foreach($homePage->find('#topic-list dd dl dd ul li') as $subcategory){
     $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, $subcategory->text());
     $count++;
 }
 $count = 2;
-foreach($homepage->find('#topic-list dd dl dt') as $category){
-    $objPHPExcel->getActiveSheet()->setCellValue('C' . $count, $category->text());
+foreach($homePage->find('#topic-list dd dl dt') as $category){
+    $objPHPExcel->getActiveSheet()->setCellValue('D' . $count, $category->text());
     $count++;
 }
 $count = 2;
-$subcategory_url = 'http://www.oxfordlearnersdictionaries.com/topic/animal_homes';
-$subcategory = new Document($subcategory_url, true);
+$subcategoryUrl = 'http://www.oxfordlearnersdictionaries.com/topic/animal_homes';
+$subcategory = new Document($subcategoryUrl, true);
 foreach($subcategory->find('#rightcolumn div div ul li') as $subject){
-    $objPHPExcel->getActiveSheet()->setCellValue('E' . $count, trim($subject->text()));
+    $objPHPExcel->getActiveSheet()->setCellValue('G' . $count, trim($subject->text()));
     $count++;
 }
 
 // Rename second worksheet
 $objPHPExcel->getActiveSheet()->setTitle('Summary');
 
-// Set active sheet index to the first sheet, so Excel opens this as the first sheet
-$objPHPExcel->setActiveSheetIndex(0);
+// Set active sheet index to the second sheet, so Excel opens this as the first sheet
+$objPHPExcel->setActiveSheetIndex(1);
 
 // Save Excel 2007 file
 $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-$objWriter->save(str_replace('.php', '.xls', __FILE__));
+$objWriter->setPreCalculateFormulas(false);
+$objWriter->save(str_replace('.php', '.xlsx', __FILE__));
 
 ?>

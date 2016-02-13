@@ -60,7 +60,11 @@ foreach ($subcategoryUrls as $subcategoryUrl) {
         $document = new Document($entryUrl, true);
 
         $entryName = $document->find('.h')[0]->text();
-        $partOfSpeech = $document->find('.pos')[0]->text();
+        if ($document->find('.pos')[0] === NULL) {
+            $partOfSpeech = '';
+        } else {
+            $partOfSpeech = $document->find('.pos')[0]->text();
+        }
 
         foreach ($document->find('.sn-gs span .def') as $entryDefinition) {
             $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
@@ -70,6 +74,7 @@ foreach ($subcategoryUrls as $subcategoryUrl) {
                 ->setCellValue('E' . $count, $partOfSpeech)
                 ->setCellValue('F' . $count, trim($entryDefinition->text()));
             $count++;
+            echo $count. PHP_EOL;
         }
     }
 }

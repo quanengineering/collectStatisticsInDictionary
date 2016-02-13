@@ -1,4 +1,7 @@
 <?php
+
+$startTime = microtime(true);
+
 require "vendor/autoload.php";
 
 use DiDom\Document;
@@ -122,5 +125,10 @@ $objPHPExcel->setActiveSheetIndex(1);
 // Save Excel 2007 file
 $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 $objWriter->save(str_replace('.php', '.xlsx', __FILE__));
+
+$endTime = microtime(true);
+$executionTime = ($endTime - $startTime)/60;
+
+echo 'Total Execution Time: '.$executionTime.' minutes';
 
 ?>

@@ -60,10 +60,10 @@ foreach ($subcategoryUrls as $subcategoryUrl) {
         $document = new Document($entryUrl, true);
 
         $entryName = $document->find('.h')[0]->text();
-        if ($document->find('.pos')[0] === NULL) {
-            $partOfSpeech = '';
-        } else {
+        if ($document->has('.pos')) {
             $partOfSpeech = $document->find('.pos')[0]->text();
+        } else {
+            $partOfSpeech = '';
         }
 
         foreach ($document->find('.sn-gs span .def') as $entryDefinition) {

@@ -61,11 +61,13 @@ foreach($entriesSelectorUrl as $entrySelectorUrl) {
             if($document->has('.sn-gs')){
                 $temp = $count;
                 foreach ($document->find('.sn-gs')[0]->find('.sn-g .def') as $key => $entryDefinition) {
-                    if($document->find('.sn-gs')[0]->find('.sn-g')[$key]->has('#ox-enlarge') != null) {
-                        $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
-                                                    ->setCellValue('B' . $count, $partOfSpeech)
-                                                    ->setCellValue('C' . $count, $entryDefinition->text());
-                        $count++;
+                    if($document->find('.sn-gs')[0]->find('.sn-g .def')[$key]->hasAttribute('psg') == null) {
+                        if($document->find('.sn-gs')[0]->find('.sn-g')[$key]->has('#ox-enlarge') != null) {
+                            $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
+                                ->setCellValue('B' . $count, $partOfSpeech)
+                                ->setCellValue('C' . $count, $entryDefinition->text());
+                            $count++;
+                        }
                     }
                 }
 
@@ -150,11 +152,13 @@ foreach($entriesSelectorUrl as $entrySelectorUrl) {
             if($document->has('.sn-gs')){
                 $temp = $count;
                 foreach ($document->find('.sn-gs')[0]->find('.sn-g .def') as $key => $entryDefinition) {
-                    if($document->find('.sn-gs')[0]->find('.sn-g')[$key]->has('#ox-enlarge') != null) {
-                        $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
-                            ->setCellValue('B' . $count, $partOfSpeech)
-                            ->setCellValue('C' . $count, $entryDefinition->text());
-                        $count++;
+                    if($document->find('.sn-gs')[0]->find('.sn-g .def')[$key]->hasAttribute('psg') == null) {
+                        if ($document->find('.sn-gs')[0]->find('.sn-g')[$key]->has('#ox-enlarge') != null) {
+                            $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
+                                ->setCellValue('B' . $count, $partOfSpeech)
+                                ->setCellValue('C' . $count, $entryDefinition->text());
+                            $count++;
+                        }
                     }
                 }
 

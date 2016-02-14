@@ -6,8 +6,6 @@ require "vendor/autoload.php";
 
 use DiDom\Document;
 
-$document = new Document('http://www.oxfordlearnersdictionaries.com/definition/english/bar-chart',true);
-$aa = $document->find('.sn-gs')[0]->find('.sn-g .def');
 //English Dictionary
 $homePageUrl = 'http://www.oxfordlearnersdictionaries.com/wordlist/english/pictures/PictureList_A-B/';
 $homePage = new Document($homePageUrl, true);

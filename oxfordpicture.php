@@ -71,7 +71,7 @@ foreach($entriesSelectorUrl as $entrySelectorUrl) {
                 $temp++;
             }
 
-            echo $count. PHP_EOL;
+            echo $entryName. PHP_EOL;
         }
 
         //end get data on current page
@@ -155,8 +155,8 @@ foreach($entriesSelectorUrl as $entrySelectorUrl) {
                 $objPHPExcel->getActiveSheet()->setCellValue('D' . $temp, $pictureUrl->getAttribute('href'));
                 $temp++;
             }
-            
-            echo $count. PHP_EOL;
+
+            echo $entryName. PHP_EOL;
         }
 
         //end get data on current page

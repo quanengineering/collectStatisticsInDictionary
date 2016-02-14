@@ -58,20 +58,22 @@ foreach($entriesSelectorUrl as $entrySelectorUrl) {
                 $partOfSpeech = '';
             }
 
-            $temp = $count;
-            foreach ($document->find('.sn-gs')[0]->find('.sn-g .def') as $entryDefinition) {
-                $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
-                    ->setCellValue('B' . $count, $partOfSpeech)
-                    ->setCellValue('C' . $count, $entryDefinition->text());
-                $count++;
-            }
+            if($document->has('.sn-gs')){
+                $temp = $count;
+                foreach ($document->find('.sn-gs')[0]->find('.sn-g .def') as $entryDefinition) {
+                    $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
+                        ->setCellValue('B' . $count, $partOfSpeech)
+                        ->setCellValue('C' . $count, $entryDefinition->text());
+                    $count++;
+                }
 
-            foreach ($document->find('.sn-gs')[0]->find('.sn-g .topic') as $pictureUrl) {
-                $objPHPExcel->getActiveSheet()->setCellValue('D' . $temp, $pictureUrl->getAttribute('href'));
-                $temp++;
-            }
+                foreach ($document->find('.sn-gs')[0]->find('.sn-g .topic') as $pictureUrl) {
+                    $objPHPExcel->getActiveSheet()->setCellValue('D' . $temp, $pictureUrl->getAttribute('href'));
+                    $temp++;
+                }
 
-            echo $entryName. PHP_EOL;
+                echo $entryName. PHP_EOL;
+            }
         }
 
         //end get data on current page
@@ -143,20 +145,22 @@ foreach($entriesSelectorUrl as $entrySelectorUrl) {
                 $partOfSpeech = '';
             }
 
-            $temp = $count;
-            foreach ($document->find('.sn-gs')[0]->find('.sn-g .def') as $entryDefinition) {
-                $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
-                    ->setCellValue('B' . $count, $partOfSpeech)
-                    ->setCellValue('C' . $count, $entryDefinition->text());
-                $count++;
-            }
+            if($document->has('.sn-gs')){
+                $temp = $count;
+                foreach ($document->find('.sn-gs')[0]->find('.sn-g .def') as $entryDefinition) {
+                    $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
+                        ->setCellValue('B' . $count, $partOfSpeech)
+                        ->setCellValue('C' . $count, $entryDefinition->text());
+                    $count++;
+                }
 
-            foreach ($document->find('.sn-gs')[0]->find('.sn-g .topic') as $pictureUrl) {
-                $objPHPExcel->getActiveSheet()->setCellValue('D' . $temp, $pictureUrl->getAttribute('href'));
-                $temp++;
-            }
+                foreach ($document->find('.sn-gs')[0]->find('.sn-g .topic') as $pictureUrl) {
+                    $objPHPExcel->getActiveSheet()->setCellValue('D' . $temp, $pictureUrl->getAttribute('href'));
+                    $temp++;
+                }
 
-            echo $entryName. PHP_EOL;
+                echo $entryName. PHP_EOL;
+            }
         }
 
         //end get data on current page

@@ -129,6 +129,6 @@ $objWriter->save(str_replace('.php', '.xlsx', __FILE__));
 $endTime = microtime(true);
 $executionTime = ($endTime - $startTime)/60;
 
-echo 'Total Execution Time: '.$executionTime.' minutes';
+echo 'Total Execution Time: '.$executionTime.' minutes' . PHP_EOL;
 
 ?>

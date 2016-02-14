@@ -77,8 +77,8 @@ foreach ($subcategoryUrls as $subcategoryUrl) {
                 ->setCellValue('E' . $count, $partOfSpeech)
                 ->setCellValue('F' . $count, trim($entryDefinition->text()));
             $count++;
-            echo $entryName. PHP_EOL;
         }
+        echo $entryName. PHP_EOL;
     }
 }
 

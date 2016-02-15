@@ -131,4 +131,4 @@ $executionTime = ($endTime - $startTime)/60;
 
 echo 'Total Execution Time: '.$executionTime.' minutes' . PHP_EOL;
 
-?>
+exit;

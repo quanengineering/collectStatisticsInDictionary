@@ -75,9 +75,11 @@ foreach ($entriesSelectorUrl as $entrySelectorUrl) {
                     }
                 }
 
-                foreach ($document->find('.sn-gs')[0]->find('.sn-g .topic') as $pictureUrl) {
-                    $objPHPExcel->getActiveSheet()->setCellValue('D' . $temp, $pictureUrl->getAttribute('href'));
-                    $temp++;
+                foreach ($document->find('.topic') as $pictureUrl) {
+                    if ($pictureUrl->has('.ox-enlarge-label')) {
+                        $objPHPExcel->getActiveSheet()->setCellValue('D' . $temp, $pictureUrl->getAttribute('href'));
+                        $temp++;
+                    }
                 }
 
                 echo $entryName . PHP_EOL;
@@ -170,9 +172,11 @@ foreach ($entriesSelectorUrl as $entrySelectorUrl) {
                     }
                 }
 
-                foreach ($document->find('.sn-gs')[0]->find('.sn-g .topic') as $pictureUrl) {
-                    $objPHPExcel->getActiveSheet()->setCellValue('D' . $temp, $pictureUrl->getAttribute('href'));
-                    $temp++;
+                foreach ($document->find('.topic') as $pictureUrl) {
+                    if ($pictureUrl->has('.ox-enlarge-label')) {
+                        $objPHPExcel->getActiveSheet()->setCellValue('D' . $temp, $pictureUrl->getAttribute('href'));
+                        $temp++;
+                    }
                 }
 
                 echo $entryName . PHP_EOL;

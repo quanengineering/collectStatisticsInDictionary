@@ -13,12 +13,12 @@ $homePage = new Document($homePageUrl, true);
 $categorySubcategoryNames = array();
 $i = 0;
 $j = 0;
-foreach($homePage->find('#topic-list dd dl dt') as $element){
+foreach ($homePage->find('#topic-list dd dl dt') as $element) {
     $categoryName = $homePage->find('#topic-list dd dl dt')[$i]->text();
-    if($homePage->find('#topic-list dd dl')[$j]->text() == ''){
+    if ($homePage->find('#topic-list dd dl')[$j]->text() == '') {
         $j++;
     }
-    foreach($homePage->find('#topic-list dd dl')[$j]->find('dd ul li') as $subcategory){
+    foreach ($homePage->find('#topic-list dd dl')[$j]->find('dd ul li') as $subcategory) {
         $categorySubcategoryNames[$subcategory->text()] = $categoryName;
     }
     $i++;
@@ -59,7 +59,7 @@ foreach ($subcategoryUrls as $subcategoryUrl) {
         $entryUrls[] = $entryUrl->getAttribute('href');
     }
 
-    foreach($entryUrls as $entryUrl){
+    foreach ($entryUrls as $entryUrl) {
         $document = new Document($entryUrl, true);
 
         $entryName = $document->find('.h')[0]->text();
@@ -78,7 +78,7 @@ foreach ($subcategoryUrls as $subcategoryUrl) {
                 ->setCellValue('F' . $count, trim($entryDefinition->text()));
             $count++;
         }
-        echo $entryName. PHP_EOL;
+        echo $entryName . PHP_EOL;
     }
 }
 
@@ -99,19 +99,19 @@ $objPHPExcel->getActiveSheet()->setCellValue('H1', "No.of entries");
 //Add data to second sheet
 $objPHPExcel->setActiveSheetIndex(1);
 $count = 2;
-foreach($homePage->find('#topic-list dd dl dd ul li') as $subcategory){
+foreach ($homePage->find('#topic-list dd dl dd ul li') as $subcategory) {
     $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, $subcategory->text());
     $count++;
 }
 $count = 2;
-foreach($homePage->find('#topic-list dd dl dt') as $category){
+foreach ($homePage->find('#topic-list dd dl dt') as $category) {
     $objPHPExcel->getActiveSheet()->setCellValue('D' . $count, $category->text());
     $count++;
 }
 $count = 2;
 $subcategoryUrl = 'http://www.oxfordlearnersdictionaries.com/topic/animal_homes';
 $subcategory = new Document($subcategoryUrl, true);
-foreach($subcategory->find('#rightcolumn div div ul li') as $subject){
+foreach ($subcategory->find('#rightcolumn div div ul li') as $subject) {
     $objPHPExcel->getActiveSheet()->setCellValue('G' . $count, trim($subject->text()));
     $count++;
 }
@@ -119,16 +119,13 @@ foreach($subcategory->find('#rightcolumn div div ul li') as $subject){
 // Rename second worksheet
 $objPHPExcel->getActiveSheet()->setTitle('Summary');
 
-// Set active sheet index to the second sheet, so Excel opens this as the first sheet
-$objPHPExcel->setActiveSheetIndex(1);
-
 // Save Excel 2007 file
 $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 $objWriter->save(str_replace('.php', '.xlsx', __FILE__));
 
 $endTime = microtime(true);
-$executionTime = ($endTime - $startTime)/60;
+$executionTime = ($endTime - $startTime) / 60;
 
-echo 'Total Execution Time: '.$executionTime.' minutes' . PHP_EOL;
+echo 'Total Execution Time: ' . $executionTime . ' minutes' . PHP_EOL;
 
 exit;

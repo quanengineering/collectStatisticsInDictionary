@@ -29,13 +29,13 @@ $objPHPExcel->getActiveSheet()->setCellValue('D1', "Picture Url");
 // Add data to first sheet
 $objPHPExcel->setActiveSheetIndex(0);
 $count = 2;
-foreach($entriesSelectorUrl as $entrySelectorUrl) {
+foreach ($entriesSelectorUrl as $entrySelectorUrl) {
 
     $nextPageUrl = $entrySelectorUrl;
-    while(true){
-        if($nextPageUrl != ''){
+    while (true) {
+        if ($nextPageUrl != '') {
             $currentPage = new Document($nextPageUrl, true);
-        }else{
+        } else {
             break;
         }
 
@@ -48,7 +48,7 @@ foreach($entriesSelectorUrl as $entrySelectorUrl) {
             $entryUrls[] = $entryUrl->getAttribute('href');
         }
 
-        foreach($entryUrls as $entryUrl){
+        foreach ($entryUrls as $entryUrl) {
             $document = new Document($entryUrl, true);
 
             $entryName = $document->find('.h')[0]->text();
@@ -58,15 +58,19 @@ foreach($entriesSelectorUrl as $entrySelectorUrl) {
                 $partOfSpeech = '';
             }
 
-            if($document->has('.sn-gs')){
+            if ($document->has('.sn-gs')) {
                 $temp = $count;
-                foreach ($document->find('.sn-gs')[0]->find('.sn-g .def') as $key => $entryDefinition) {
-                    if($document->find('.sn-gs')[0]->find('.sn-g .def')[$key]->hasAttribute('psg') == null) {
-                        if($document->find('.sn-gs')[0]->find('.sn-g')[$key]->has('#ox-enlarge') != null) {
-                            $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
-                                ->setCellValue('B' . $count, $partOfSpeech)
-                                ->setCellValue('C' . $count, $entryDefinition->text());
-                            $count++;
+                foreach ($document->find('.sn-gs .sn-g') as $element) {
+                    if ($element->has('#ox-enlarge')) {
+                        foreach ($element->find('.def') as $entryDefinition) {
+                            if (!$entryDefinition->hasAttribute('psg')) {
+
+                                $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
+                                    ->setCellValue('B' . $count, $partOfSpeech)
+                                    ->setCellValue('C' . $count, $entryDefinition->text());
+
+                                $count++;
+                            }
                         }
                     }
                 }
@@ -76,19 +80,19 @@ foreach($entriesSelectorUrl as $entrySelectorUrl) {
                     $temp++;
                 }
 
-                echo $entryName. PHP_EOL;
+                echo $entryName . PHP_EOL;
             }
         }
 
         //end get data on current page
 
-        if($currentPage->has('.activepage')){
-            if(array_pop($currentPage->find('.paging_links')[0]->find('a'))->text() == '>'){
+        if ($currentPage->has('.activepage')) {
+            if (array_pop($currentPage->find('.paging_links')[0]->find('a'))->text() == '>') {
                 $nextPageUrl = array_pop($currentPage->find('.paging_links')[0]->find('a'))->getAttribute('href');
-            }else{
+            } else {
                 $nextPageUrl = '';
             }
-        }else{
+        } else {
             $nextPageUrl = '';
         }
     }
@@ -120,13 +124,13 @@ $objPHPExcel->getActiveSheet()->setCellValue('D1', "Picture Url");
 // Add data to second sheet
 $objPHPExcel->setActiveSheetIndex(1);
 $count = 2;
-foreach($entriesSelectorUrl as $entrySelectorUrl) {
+foreach ($entriesSelectorUrl as $entrySelectorUrl) {
 
     $nextPageUrl = $entrySelectorUrl;
-    while(true){
-        if($nextPageUrl != ''){
+    while (true) {
+        if ($nextPageUrl != '') {
             $currentPage = new Document($nextPageUrl, true);
-        }else{
+        } else {
             break;
         }
 
@@ -139,7 +143,7 @@ foreach($entriesSelectorUrl as $entrySelectorUrl) {
             $entryUrls[] = $entryUrl->getAttribute('href');
         }
 
-        foreach($entryUrls as $entryUrl){
+        foreach ($entryUrls as $entryUrl) {
             $document = new Document($entryUrl, true);
 
             $entryName = $document->find('.h')[0]->text();
@@ -149,15 +153,19 @@ foreach($entriesSelectorUrl as $entrySelectorUrl) {
                 $partOfSpeech = '';
             }
 
-            if($document->has('.sn-gs')){
+            if ($document->has('.sn-gs')) {
                 $temp = $count;
-                foreach ($document->find('.sn-gs')[0]->find('.sn-g .def') as $key => $entryDefinition) {
-                    if($document->find('.sn-gs')[0]->find('.sn-g .def')[$key]->hasAttribute('psg') == null) {
-                        if ($document->find('.sn-gs')[0]->find('.sn-g')[$key]->has('#ox-enlarge') != null) {
-                            $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
-                                ->setCellValue('B' . $count, $partOfSpeech)
-                                ->setCellValue('C' . $count, $entryDefinition->text());
-                            $count++;
+                foreach ($document->find('.sn-gs .sn-g') as $element) {
+                    if ($element->has('#ox-enlarge')) {
+                        foreach ($element->find('.def') as $entryDefinition) {
+                            if (!$entryDefinition->hasAttribute('psg')) {
+
+                                $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
+                                    ->setCellValue('B' . $count, $partOfSpeech)
+                                    ->setCellValue('C' . $count, $entryDefinition->text());
+
+                                $count++;
+                            }
                         }
                     }
                 }
@@ -167,19 +175,19 @@ foreach($entriesSelectorUrl as $entrySelectorUrl) {
                     $temp++;
                 }
 
-                echo $entryName. PHP_EOL;
+                echo $entryName . PHP_EOL;
             }
         }
 
         //end get data on current page
 
-        if($currentPage->has('.activepage')){
-            if(array_pop($currentPage->find('.paging_links')[0]->find('a'))->text() == '>'){
+        if ($currentPage->has('.activepage')) {
+            if (array_pop($currentPage->find('.paging_links')[0]->find('a'))->text() == '>') {
                 $nextPageUrl = array_pop($currentPage->find('.paging_links')[0]->find('a'))->getAttribute('href');
-            }else{
+            } else {
                 $nextPageUrl = '';
             }
-        }else{
+        } else {
             $nextPageUrl = '';
         }
 
@@ -195,8 +203,8 @@ $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 $objWriter->save(str_replace('.php', '.xlsx', __FILE__));
 
 $endTime = microtime(true);
-$executionTime = ($endTime - $startTime)/60;
+$executionTime = ($endTime - $startTime) / 60;
 
-echo 'Total Execution Time: '.$executionTime.' minutes' . PHP_EOL;
+echo 'Total Execution Time: ' . $executionTime . ' minutes' . PHP_EOL;
 
 ?>

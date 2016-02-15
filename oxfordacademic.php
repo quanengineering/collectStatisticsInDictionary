@@ -59,8 +59,8 @@ foreach ($sublistsSelectorUrl as $sublistSelectorUrl) {
             }
 
             $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
-                                        ->setCellValue('B' . $count, $partOfSpeech)
-                                        ->setCellValue('C' . $count, $sublistName);
+                ->setCellValue('B' . $count, $partOfSpeech)
+                ->setCellValue('C' . $count, $sublistName);
             $count++;
 
             echo $entryName . PHP_EOL;

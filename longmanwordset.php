@@ -82,6 +82,8 @@ for ($i = 1; $i <= 215; $i++) {
     $wordsetName = $document->find('.ws-head')[0]->text();
 
     $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, $wordsetName);
+
+    $count++;
 }
 
 // Rename second worksheet

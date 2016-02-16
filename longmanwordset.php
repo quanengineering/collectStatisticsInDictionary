@@ -36,8 +36,11 @@ for ($i = 1; $i <= 215; $i++) {
 
     foreach ($document->find('.wswd') as $entry) {
         $entry = $entry->text();
-        $entryName = strstr($entry, ',', true);
-        $pos = substr($entry, strpos($entry, ', ') + strlen(', '));
+        $entryName = substr($entry, 0, strrpos($entry, ', '));
+        $pos = substr($entry, strrpos($entry, ', ') + strlen(', '));
+        if (!$pos) {
+            $pos = '';
+        }
 
         $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, $entryName)
             ->setCellValue('B' . $count, $pos)

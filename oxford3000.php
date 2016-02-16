@@ -111,7 +111,6 @@ $objPHPExcel->createSheet();
 $objPHPExcel->setActiveSheetIndex(1);
 $objPHPExcel->getActiveSheet()->setCellValue('A1', "Entry");
 $objPHPExcel->getActiveSheet()->setCellValue('B1', "Part of Speech");
-$objPHPExcel->getActiveSheet()->setCellValue('C1', "Definition");
 
 // Add data to second sheet
 $objPHPExcel->setActiveSheetIndex(1);
@@ -145,25 +144,11 @@ foreach ($entriesSelectorUrl as $entrySelectorUrl) {
                 $partOfSpeech = '';
             }
 
-            if ($document->has('.sn-gs')) {
-                foreach ($document->find('.sn-gs .sn-g') as $element) {
-                    if ($element->has('.sym_first')) {
-                        foreach ($element->find('.def') as $entryDefinition) {
-                            if (!$entryDefinition->hasAttribute('psg')) {
+            $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
+                ->setCellValue('B' . $count, $partOfSpeech);
+            $count++;
 
-                                $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, trim($entryName))
-                                    ->setCellValue('B' . $count, $partOfSpeech)
-                                    ->setCellValue('C' . $count, $entryDefinition->text());
-                                $count++;
-
-                            }
-                        }
-                    }
-                }
-
-                echo $entryName . PHP_EOL;
-
-            }
+            echo $entryName . PHP_EOL;
         }
 
         //end get data on current page

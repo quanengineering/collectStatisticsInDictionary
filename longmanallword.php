@@ -45,6 +45,8 @@ do {
 
     $url = 'http://global.longmandictionaries.com/dict_search/get_entry_chunk_for_alpha_key/ldoce6/' . $alphaKey . '/1/';
 
+    sleep(5);
+
 } while ($alphaKey != 'zzz');
 
 // Rename first worksheet

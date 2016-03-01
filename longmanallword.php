@@ -28,7 +28,7 @@ do {
 
     $document = new Document($response);
     foreach ($document->find('a') as $element) {
-        $entry = $entry->text();
+        $entry = $element->text();
         $entryName = substr($entry, 0, strrpos($entry, ' '));
         $pos = substr($entry, strrpos($entry, ' ') + strlen(' '));
         if (!$pos) {

@@ -8,15 +8,17 @@ use DiDom\Document;
 use Box\Spout\Writer\WriterFactory;
 use Box\Spout\Common\Type;
 
-$writer = WriterFactory::create(Type::XLSX);
-$writer->openToFile(str_replace('.php', '.xlsx', __FILE__));
-$headerRow = ['Entry', 'Part of Speech', 'alpha_key', 'key', 'entry_html'];
+$writer = WriterFactory::create(Type::CSV);
+$writer->openToFile(str_replace('.php', '.csv', __FILE__));
+$headerRow = ['Entry', 'Part of Speech', 'alpha_key', 'key', 'entry_html', 'entry_for_alpha_key', 'other_words'];
 
 $writer->addRow($headerRow);
 
 # Create a connection
 $url = 'http://global.longmandictionaries.com/dict_search/get_initial_entries/ldoce6/';
 
+$entry_have_maxlength_other_words = '';
+$entry_have_maxlength_entry_for_alpha_key = '';
 $maxlength_other_words = 0;
 $maxlength_entry_for_alpha_key = 0;
 do {
@@ -58,6 +60,7 @@ do {
         $entry_for_alpha_key = curl_exec($ch);
         if($maxlength_entry_for_alpha_key < strlen($entry_for_alpha_key)){
             $maxlength_entry_for_alpha_key = strlen($entry_for_alpha_key);
+            $entry_have_maxlength_entry_for_alpha_key = $entryName;
         }
         curl_close($ch);
 
@@ -78,15 +81,16 @@ do {
         $other_words = curl_exec($ch);
         if($maxlength_other_words < strlen($other_words)){
             $maxlength_other_words = strlen($other_words);
+            $entry_have_maxlength_other_words = $entryName;
         }
         curl_close($ch);
 
-        $singleRow = [$entryName, $pos, $alphaKey, $key, $element->html()];
+        $singleRow = [$entryName, $pos, $alphaKey, $key, $element->html(), $entry_for_alpha_key, $other_words];
         $writer->addRow($singleRow);
 
         echo $entryName . PHP_EOL;
-        echo $maxlength_entry_for_alpha_key . PHP_EOL;
-        echo $maxlength_other_words . PHP_EOL;
+        echo $entry_have_maxlength_entry_for_alpha_key . ' have max length_entry_for_alpha_key: ' . $maxlength_entry_for_alpha_key . PHP_EOL;
+        echo $entry_have_maxlength_other_words . ' have max length_other_words: ' . $maxlength_other_words . PHP_EOL;
     }
 
     if ($alphaKey == 'insipidness,_insipidity_d1') {

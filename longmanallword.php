@@ -5,21 +5,17 @@ $startTime = microtime(true);
 require "vendor/autoload.php";
 
 use DiDom\Document;
+use Box\Spout\Writer\WriterFactory;
+use Box\Spout\Common\Type;
 
-// Create new PHPExcel object
-$objPHPExcel = new PHPExcel();
+$writer = WriterFactory::create(Type::XLSX);
+$writer->openToFile(str_replace('.php', '.xlsx', __FILE__));
+$headerRow = ['Entry', 'alpha_key'];
 
-// Create first sheet
-$objPHPExcel->setActiveSheetIndex(0);
-$objPHPExcel->getActiveSheet()->setCellValue('A1', "Entry");
-$objPHPExcel->getActiveSheet()->setCellValue('B1', "alpha_key");
+$writer->addRow($headerRow);
 
 # Create a connection
 $url = 'http://global.longmandictionaries.com/dict_search/get_initial_entries/ldoce6/';
-
-// Add data to first sheet
-$objPHPExcel->setActiveSheetIndex(0);
-$count = 2;
 
 do {
     $ch = curl_init($url);
@@ -36,9 +32,8 @@ do {
         $entryName = substr($entryName, 0, strrpos($entryName, ' '));
         $alphaKey = $element->getAttribute('data-alphakey');
 
-        $objPHPExcel->getActiveSheet()->setCellValue('A' . $count, $entryName)
-            ->setCellValue('B' . $count, $alphaKey);
-        $count++;
+        $singleRow = [$entryName, $alphaKey];
+        $writer->addRow($singleRow);
 
         echo $entryName . PHP_EOL;
     }
@@ -46,7 +41,7 @@ do {
     if ($alphaKey == 'insipidness,_insipidity_d1') {
         $alphaKey = 'insipidly_d1';
     }
-    
+
     if ($alphaKey == 'leninist,_leninite_d1') {
         $alphaKey = 'leninism';
     }
@@ -55,12 +50,7 @@ do {
 
 } while ($alphaKey != 'zzz');
 
-// Rename first worksheet
-$objPHPExcel->getActiveSheet()->setTitle('Longman');
-
-// Save Excel 2007 file
-$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-$objWriter->save(str_replace('.php', '.xlsx', __FILE__));
+$writer->close();
 
 $endTime = microtime(true);
 $executionTime = ($endTime - $startTime) / 60;

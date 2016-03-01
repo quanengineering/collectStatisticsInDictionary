@@ -38,7 +38,7 @@ do {
         $alphaKey = $element->getAttribute('data-alphakey');
         $key = $element->getAttribute('data-key');
 
-        $singleRow = [$entryName, $pos, $alphaKey, $key, $element];
+        $singleRow = [$entryName, $pos, $alphaKey, $key, $element->html()];
         $writer->addRow($singleRow);
 
         echo $entryName . PHP_EOL;

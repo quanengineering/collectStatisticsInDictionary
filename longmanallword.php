@@ -10,7 +10,7 @@ use Box\Spout\Common\Type;
 
 $writer = WriterFactory::create(Type::XLSX);
 $writer->openToFile(str_replace('.php', '.xlsx', __FILE__));
-$headerRow = ['Entry', 'alpha_key'];
+$headerRow = ['Entry', 'Part of Speech', 'alpha_key', 'key', 'entry_html'];
 
 $writer->addRow($headerRow);
 
@@ -28,11 +28,17 @@ do {
 
     $document = new Document($response);
     foreach ($document->find('a') as $element) {
-        $entryName = $element->text();
-        $entryName = substr($entryName, 0, strrpos($entryName, ' '));
-        $alphaKey = $element->getAttribute('data-alphakey');
+        $entry = $entry->text();
+        $entryName = substr($entry, 0, strrpos($entry, ' '));
+        $pos = substr($entry, strrpos($entry, ' ') + strlen(' '));
+        if (!$pos) {
+            $pos = '';
+        }
 
-        $singleRow = [$entryName, $alphaKey];
+        $alphaKey = $element->getAttribute('data-alphakey');
+        $key = $element->getAttribute('data-key');
+
+        $singleRow = [$entryName, $pos, $alphaKey, $key, $element];
         $writer->addRow($singleRow);
 
         echo $entryName . PHP_EOL;

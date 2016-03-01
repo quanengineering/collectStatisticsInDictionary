@@ -47,6 +47,10 @@ do {
         $alphaKey = 'insipidly_d1';
     }
     
+    if ($alphaKey == 'leninist,_leninite_d1') {
+        $alphaKey = 'leninism';
+    }
+
     $url = 'http://global.longmandictionaries.com/dict_search/get_entry_chunk_for_alpha_key/ldoce6/' . $alphaKey . '/1/';
 
 } while ($alphaKey != 'zzz');

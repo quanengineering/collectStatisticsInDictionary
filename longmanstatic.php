@@ -37,8 +37,8 @@ foreach ($reader->getSheetIterator() as $sheet) {
             }
         }
 
-        echo $count . PHP_EOL;
     }
+    echo $count . PHP_EOL;
 }
 
 $reader->close();

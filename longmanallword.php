@@ -79,6 +79,10 @@ do {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         # Get the response
         $other_words = curl_exec($ch);
+        $other_words_document = new Document($other_words);
+        if(count($elements = $other_words_document->find('li')) == 0){
+            $other_words = '';
+        }
         if($maxlength_other_words < strlen($other_words)){
             $maxlength_other_words = strlen($other_words);
             $entry_have_maxlength_other_words = $entryName;

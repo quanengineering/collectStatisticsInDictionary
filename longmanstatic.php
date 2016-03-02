@@ -17,8 +17,10 @@ foreach ($reader->getSheetIterator() as $sheet) {
     foreach ($sheet->getRowIterator() as $row) {
 
         $document = new Document($row[5]);
-        $word = $document->find('.hyphenation')[0];
-        echo 'Word: ' . $word->text() . PHP_EOL;
+        if($document->has('.hyphenation')){
+            $word = $document->find('.hyphenation')[0];
+            echo 'Word: ' . $word->text() . PHP_EOL;
+        }
 
         foreach ($document->find('.sense') as $element) {
             if ($element->has('.subsense')) {

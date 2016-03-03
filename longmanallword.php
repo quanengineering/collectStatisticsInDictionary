@@ -10,7 +10,8 @@ use Box\Spout\Common\Type;
 
 $writer = WriterFactory::create(Type::CSV);
 $writer->openToFile(str_replace('.php', '.csv', __FILE__));
-$headerRow = ['Entry', 'Part of Speech', 'alpha_key', 'key', 'entry_html', 'entry_for_alpha_key', 'other_words'];
+$headerRow = ['Entry', 'Part of Speech', 'alpha_key', 'key', 'entry_html', 'entry_for_alpha_key'];
+//$headerRow = ['Entry', 'Part of Speech', 'alpha_key', 'key', 'entry_html', 'entry_for_alpha_key', 'other_words'];
 
 $writer->addRow($headerRow);
 
@@ -89,7 +90,8 @@ do {
         }
         curl_close($ch);
 
-        $singleRow = [$entryName, $pos, $alphaKey, $key, $element->html(), $entry_for_alpha_key, $other_words];
+        $singleRow = [$entryName, $pos, $alphaKey, $key, $element->html(), $entry_for_alpha_key];
+//        $singleRow = [$entryName, $pos, $alphaKey, $key, $element->html(), $entry_for_alpha_key, $other_words];
         $writer->addRow($singleRow);
 
         echo $entryName . PHP_EOL;

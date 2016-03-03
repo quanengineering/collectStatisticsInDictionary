@@ -9,6 +9,14 @@ use DiDom\Query;
 use Box\Spout\Reader\ReaderFactory;
 use Box\Spout\Common\Type;
 
+//error handler function
+function customError($errno, $errstr) {
+    echo "<b>Error:</b> [$errno] $errstr";
+}
+
+//set error handler
+set_error_handler("customError");
+
 $filePath = "data/longmanallword.csv";
 $reader = ReaderFactory::create(Type::CSV);
 $reader->open($filePath);

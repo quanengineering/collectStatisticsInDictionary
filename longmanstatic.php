@@ -106,7 +106,7 @@ do {
 
 } while ($alphaKey != 'zzz');
 
-echo 'Total word: ' . $count_total_word;
+echo 'Total word: ' . $count_total_word . PHP_EOL;
 echo 'Total word is not encyclopaedic entry: ' . $count_word_is_not_encyclopaedic_entry . PHP_EOL;
 echo 'Total definition is not encyclopaedic entry: ' . $count_definition_is_not_encyclopaedic_entry . PHP_EOL;
 

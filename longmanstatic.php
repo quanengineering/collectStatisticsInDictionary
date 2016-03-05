@@ -80,11 +80,9 @@ do {
             //check if word is NOT an encyclopaedic entry
             if (count($elements = $entry_detail_document->find("//span[contains(@type, 'encyc')]", Query::TYPE_XPATH)) == 0) {
 
-                if (count($elements = $entry_detail_document->find('.hyphenation')) != 0) {
-                    $word = $entry_detail_document->find('.hyphenation')[0];
-                    echo 'Word: ' . $word->text() . PHP_EOL;
-                    $count_word_is_not_encyclopaedic_entry++;
-                }
+                $word = $entry_detail_document->find('.hwd')[0];
+                echo 'Word: ' . $word->text() . PHP_EOL;
+                $count_word_is_not_encyclopaedic_entry++;
 
                 foreach ($entry_detail_document->find('.sense') as $element) {
                     if (count($elements = $element->find('.subsense')) != 0) {

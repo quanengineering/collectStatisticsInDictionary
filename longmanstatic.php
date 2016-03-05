@@ -76,7 +76,7 @@ do {
 
         $entry_detail_document = new Document($entry_detail);
         //check if word is an important word
-        if (count($elements = $element->find('kw')) != 0) {
+        if (count($elements = $element->find('.kw')) != 0) {
             //check if word is NOT an encyclopaedic entry
             if (count($elements = $entry_detail_document->find("//span[contains(@type, 'encyc')]", Query::TYPE_XPATH)) == 0) {
 

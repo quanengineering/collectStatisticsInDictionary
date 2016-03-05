@@ -18,8 +18,9 @@ function customError($errno, $errstr)
 //set error handler
 set_error_handler("customError");
 
-$count_word = 0;
-$count_definition = 0;
+$count_total_word = 0;
+$count_word_is_not_encyclopaedic_entry = 0;
+$count_definition_is_not_encyclopaedic_entry = 0;
 # Create a connection
 $url = 'http://global.longmandictionaries.com/dict_search/get_initial_entries/ldoce6/';
 
@@ -63,31 +64,32 @@ do {
         curl_close($ch);
 
         $entry_detail_document = new Document($entry_detail);
-        //check if word is NOT in culture word list
+        //check if word is NOT an encyclopaedic entry
         if (count($elements = $entry_detail_document->find("//span[contains(@type, 'encyc')]", Query::TYPE_XPATH)) == 0) {
 
             if (count($elements = $entry_detail_document->find('.hyphenation')) != 0) {
                 $word = $entry_detail_document->find('.hyphenation')[0];
                 echo 'Word: ' . $word->text() . PHP_EOL;
-                $count_word++;
+                $count_word_is_not_encyclopaedic_entry++;
             }
 
             foreach ($entry_detail_document->find('.sense') as $element) {
                 if (count($elements = $element->find('.subsense')) != 0) {
                     foreach ($element->find('.subsense .def') as $item) {
                         echo trim($item->text()) . PHP_EOL;
-                        $count_definition++;
+                        $count_definition_is_not_encyclopaedic_entry++;
                     }
                 } else {
                     if (count($elements = $element->find('.def')) != 0) {
                         $item = $element->find('.def')[0];
                         echo trim($item->text()) . PHP_EOL;
-                        $count_definition++;
+                        $count_definition_is_not_encyclopaedic_entry++;
                     }
                 }
             }
 
         }
+        $count_total_word++;
 
         echo $entryName . PHP_EOL;
     }
@@ -104,8 +106,9 @@ do {
 
 } while ($alphaKey != 'zzz');
 
-echo 'Total word: ' . $count_word . PHP_EOL;
-echo 'Total definition: ' . $count_definition . PHP_EOL;
+echo 'Total word: ' . $count_total_word;
+echo 'Total word is not encyclopaedic entry: ' . $count_word_is_not_encyclopaedic_entry . PHP_EOL;
+echo 'Total definition is not encyclopaedic entry: ' . $count_definition_is_not_encyclopaedic_entry . PHP_EOL;
 
 $endTime = microtime(true);
 $executionTime = ($endTime - $startTime) / 60;

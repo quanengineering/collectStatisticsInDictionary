@@ -10,8 +10,11 @@ use Box\Spout\Reader\ReaderFactory;
 use Box\Spout\Common\Type;
 
 //error handler function
-function customError($errno, $errstr) {
-    echo "<b>Error:</b> [$errno] $errstr";
+function customError($errno, $errstr)
+{
+    echo PHP_EOL . "<b>Error:</b> [$errno] $errstr<br>";
+    echo PHP_EOL . "Ending Script" . PHP_EOL;
+    die();
 }
 
 //set error handler

@@ -6,6 +6,8 @@ require "vendor/autoload.php";
 
 use DiDom\Document;
 use DiDom\Query;
+use Box\Spout\Writer\WriterFactory;
+use Box\Spout\Common\Type;
 
 //error handler function
 function customError($errno, $errstr)
@@ -17,6 +19,11 @@ function customError($errno, $errstr)
 
 //set error handler
 set_error_handler("customError");
+
+$writer = WriterFactory::create(Type::XLSX);
+$writer->openToFile(str_replace('.php', '.xlsx', __FILE__));
+$headerRow = ['Entry', 'Part of Speech', 'alpha_key', 'definition'];
+$writer->addRow($headerRow);
 
 $count_total_word = 0;
 $count_word_is_not_encyclopaedic_entry = 0;
@@ -78,16 +85,19 @@ do {
                     foreach ($element->find('.subsense .def') as $item) {
                         echo trim($item->text()) . PHP_EOL;
                         $count_definition_is_not_encyclopaedic_entry++;
+                        $singleRow = [$entryName, $pos, $alphaKey, trim($item->text())];
                     }
                 } else {
                     if (count($elements = $element->find('.def')) != 0) {
                         $item = $element->find('.def')[0];
                         echo trim($item->text()) . PHP_EOL;
                         $count_definition_is_not_encyclopaedic_entry++;
+                        $singleRow = [$entryName, $pos, $alphaKey, trim($item->text())];
                     }
                 }
             }
 
+            $writer->addRow($singleRow);
         }
         $count_total_word++;
 
@@ -105,6 +115,8 @@ do {
     $url = 'http://global.longmandictionaries.com/dict_search/get_entry_chunk_for_alpha_key/ldoce6/' . $alphaKey . '/1/';
 
 } while ($alphaKey != 'zzz');
+
+$writer->close();
 
 echo 'Total word: ' . $count_total_word . PHP_EOL;
 echo 'Total word is not encyclopaedic entry: ' . $count_word_is_not_encyclopaedic_entry . PHP_EOL;

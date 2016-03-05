@@ -55,28 +55,28 @@ do {
 
         $alphaKey = $element->getAttribute('data-alphakey');
 
-        # new data
-        $data = array(
-            'alpha_key' => $alphaKey,
-            'name' => ''
-        );
-        # Create a connection
-        $url = 'http://global.longmandictionaries.com/dict_search/entry_for_alpha_key/ldoce6/';
-        $ch = curl_init($url);
-        # Form data string
-        $postString = http_build_query($data, '', '&');
-        # Setting options
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postString);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        # Get the response
-        $entry_detail = curl_exec($ch);
-
-        curl_close($ch);
-
-        $entry_detail_document = new Document($entry_detail);
         //check if word is an important word
         if (count($elements = $element->find('.kw')) != 0) {
+            # new data
+            $data = array(
+                'alpha_key' => $alphaKey,
+                'name' => ''
+            );
+            # Create a connection
+            $url = 'http://global.longmandictionaries.com/dict_search/entry_for_alpha_key/ldoce6/';
+            $ch = curl_init($url);
+            # Form data string
+            $postString = http_build_query($data, '', '&');
+            # Setting options
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postString);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            # Get the response
+            $entry_detail = curl_exec($ch);
+
+            curl_close($ch);
+
+            $entry_detail_document = new Document($entry_detail);
             //check if word is NOT an encyclopaedic entry
             if (count($elements = $entry_detail_document->find("//span[contains(@type, 'encyc')]", Query::TYPE_XPATH)) == 0) {
 

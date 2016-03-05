@@ -42,70 +42,74 @@ do {
 
     $document = new Document($response);
     foreach ($document->find('a') as $element) {
-        $entry = $element->text();
-        $entryName = substr($entry, 0, strrpos($entry, ' '));
-        if(count($elements = $element->find('sup')) != 0){
-            $entryName = substr($entryName, 0, -1);
-        }
-        $pos = substr($entry, strrpos($entry, ' ') + strlen(' '));
-        if (!$pos) {
-            $pos = '';
-        }
+        //check if word is an important word
+        if (count($elements = $element->find('kw')) != 0) {
 
-        $alphaKey = $element->getAttribute('data-alphakey');
-
-        # new data
-        $data = array(
-            'alpha_key' => $alphaKey,
-            'name' => ''
-        );
-        # Create a connection
-        $url = 'http://global.longmandictionaries.com/dict_search/entry_for_alpha_key/ldoce6/';
-        $ch = curl_init($url);
-        # Form data string
-        $postString = http_build_query($data, '', '&');
-        # Setting options
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postString);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        # Get the response
-        $entry_detail = curl_exec($ch);
-
-        curl_close($ch);
-
-        $entry_detail_document = new Document($entry_detail);
-        //check if word is NOT an encyclopaedic entry
-        if (count($elements = $entry_detail_document->find("//span[contains(@type, 'encyc')]", Query::TYPE_XPATH)) == 0) {
-
-            if (count($elements = $entry_detail_document->find('.hyphenation')) != 0) {
-                $word = $entry_detail_document->find('.hyphenation')[0];
-                echo 'Word: ' . $word->text() . PHP_EOL;
-                $count_word_is_not_encyclopaedic_entry++;
+            $entry = $element->text();
+            $entryName = substr($entry, 0, strrpos($entry, ' '));
+            if (count($elements = $element->find('sup')) != 0) {
+                $entryName = substr($entryName, 0, -1);
+            }
+            $pos = substr($entry, strrpos($entry, ' ') + strlen(' '));
+            if (!$pos) {
+                $pos = '';
             }
 
-            foreach ($entry_detail_document->find('.sense') as $element) {
-                if (count($elements = $element->find('.subsense')) != 0) {
-                    foreach ($element->find('.subsense .def') as $item) {
-                        echo trim($item->text()) . PHP_EOL;
-                        $count_definition_is_not_encyclopaedic_entry++;
-                        $singleRow = [$entryName, $pos, $alphaKey, trim($item->text())];
-                        $writer->addRow($singleRow);
-                    }
-                } else {
-                    if (count($elements = $element->find('.def')) != 0) {
-                        $item = $element->find('.def')[0];
-                        echo trim($item->text()) . PHP_EOL;
-                        $count_definition_is_not_encyclopaedic_entry++;
-                        $singleRow = [$entryName, $pos, $alphaKey, trim($item->text())];
-                        $writer->addRow($singleRow);
+            $alphaKey = $element->getAttribute('data-alphakey');
+
+            # new data
+            $data = array(
+                'alpha_key' => $alphaKey,
+                'name' => ''
+            );
+            # Create a connection
+            $url = 'http://global.longmandictionaries.com/dict_search/entry_for_alpha_key/ldoce6/';
+            $ch = curl_init($url);
+            # Form data string
+            $postString = http_build_query($data, '', '&');
+            # Setting options
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postString);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            # Get the response
+            $entry_detail = curl_exec($ch);
+
+            curl_close($ch);
+
+            $entry_detail_document = new Document($entry_detail);
+            //check if word is NOT an encyclopaedic entry
+            if (count($elements = $entry_detail_document->find("//span[contains(@type, 'encyc')]", Query::TYPE_XPATH)) == 0) {
+
+                if (count($elements = $entry_detail_document->find('.hyphenation')) != 0) {
+                    $word = $entry_detail_document->find('.hyphenation')[0];
+                    echo 'Word: ' . $word->text() . PHP_EOL;
+                    $count_word_is_not_encyclopaedic_entry++;
+                }
+
+                foreach ($entry_detail_document->find('.sense') as $element) {
+                    if (count($elements = $element->find('.subsense')) != 0) {
+                        foreach ($element->find('.subsense .def') as $item) {
+                            echo trim($item->text()) . PHP_EOL;
+                            $count_definition_is_not_encyclopaedic_entry++;
+                            $singleRow = [$entryName, $pos, $alphaKey, trim($item->text())];
+                            $writer->addRow($singleRow);
+                        }
+                    } else {
+                        if (count($elements = $element->find('.def')) != 0) {
+                            $item = $element->find('.def')[0];
+                            echo trim($item->text()) . PHP_EOL;
+                            $count_definition_is_not_encyclopaedic_entry++;
+                            $singleRow = [$entryName, $pos, $alphaKey, trim($item->text())];
+                            $writer->addRow($singleRow);
+                        }
                     }
                 }
+
             }
+            $count_total_word++;
 
+            echo $entryName . PHP_EOL;
         }
-        $count_total_word++;
-
-        echo $entryName . PHP_EOL;
     }
 
     if ($alphaKey == 'insipidness,_insipidity_d1') {

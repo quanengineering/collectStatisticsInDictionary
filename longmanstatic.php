@@ -107,7 +107,6 @@ do {
         }
         $count_total_word++;
 
-        echo $entryName . PHP_EOL;
 
     }
 

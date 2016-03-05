@@ -42,20 +42,21 @@ do {
 
     $document = new Document($response);
     foreach ($document->find('a') as $element) {
+
+        $entry = $element->text();
+        $entryName = substr($entry, 0, strrpos($entry, ' '));
+        if (count($elements = $element->find('sup')) != 0) {
+            $entryName = substr($entryName, 0, -1);
+        }
+        $pos = substr($entry, strrpos($entry, ' ') + strlen(' '));
+        if (!$pos) {
+            $pos = '';
+        }
+
+        $alphaKey = $element->getAttribute('data-alphakey');
+
         //check if word is an important word
         if (count($elements = $element->find('kw')) != 0) {
-
-            $entry = $element->text();
-            $entryName = substr($entry, 0, strrpos($entry, ' '));
-            if (count($elements = $element->find('sup')) != 0) {
-                $entryName = substr($entryName, 0, -1);
-            }
-            $pos = substr($entry, strrpos($entry, ' ') + strlen(' '));
-            if (!$pos) {
-                $pos = '';
-            }
-
-            $alphaKey = $element->getAttribute('data-alphakey');
 
             # new data
             $data = array(

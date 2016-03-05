@@ -44,6 +44,9 @@ do {
     foreach ($document->find('a') as $element) {
         $entry = $element->text();
         $entryName = substr($entry, 0, strrpos($entry, ' '));
+        if(count($elements = $element->find('sup')) != 0){
+            $entryName = substr($entryName, 0, -1);
+        }
         $pos = substr($entry, strrpos($entry, ' ') + strlen(' '));
         if (!$pos) {
             $pos = '';
@@ -86,6 +89,7 @@ do {
                         echo trim($item->text()) . PHP_EOL;
                         $count_definition_is_not_encyclopaedic_entry++;
                         $singleRow = [$entryName, $pos, $alphaKey, trim($item->text())];
+                        $writer->addRow($singleRow);
                     }
                 } else {
                     if (count($elements = $element->find('.def')) != 0) {
@@ -93,11 +97,11 @@ do {
                         echo trim($item->text()) . PHP_EOL;
                         $count_definition_is_not_encyclopaedic_entry++;
                         $singleRow = [$entryName, $pos, $alphaKey, trim($item->text())];
+                        $writer->addRow($singleRow);
                     }
                 }
             }
 
-            $writer->addRow($singleRow);
         }
         $count_total_word++;
 

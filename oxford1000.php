@@ -29,7 +29,7 @@ for ($i = 1; $i <= 20; $i++) {
     $document = new Document($documentUrl, true);
 
     foreach ($document->find('.arl_hw') as $element) {
-        echo $element->text();
+        echo $element->text() . PHP_EOL;
         $singleRow = [$element->text()];
         $writer->addRow($singleRow);
     }
@@ -40,7 +40,7 @@ for ($i = 1; $i <= 20; $i++) {
     $document = new Document($documentUrl, true);
 
     foreach ($document->find('.arl_hw') as $element) {
-        echo $element->text();
+        echo $element->text() . PHP_EOL;;
         $singleRow = [$element->text()];
         $writer->addRow($singleRow);
     }

@@ -52,6 +52,8 @@ foreach ($entriesSelectorUrl as $entrySelectorUrl) {
 
             $singleRow = [$entryName, $pos];
             $writer->addRow($singleRow);
+
+            echo $entryName . PHP_EOL;
         }
 
         //end get data on current page

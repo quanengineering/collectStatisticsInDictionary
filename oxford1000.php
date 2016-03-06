@@ -24,23 +24,25 @@ $writer->openToFile(str_replace('.php', '.xlsx', __FILE__));
 $headerRow = ['Entry', 'Part of Speech'];
 $writer->addRow($headerRow);
 
-for($i = 1; $i <= 20; $i++){
+for ($i = 1; $i <= 20; $i++) {
     $documentUrl = 'http://www.oxforddictionaries.com/top1000/english?page=' . $i;
     $document = new Document($documentUrl, true);
 
-    foreach($document->find('.arl_hw') as $element){
+    foreach ($document->find('.arl_hw') as $element) {
         echo $element->text();
-        $writer->addRow($element->text());
+        $singleRow = [$element->text()];
+        $writer->addRow($singleRow);
     }
 }
 
-for($i = 1; $i <= 20; $i++){
+for ($i = 1; $i <= 20; $i++) {
     $documentUrl = 'http://www.oxforddictionaries.com/top1000/american_english?page=' . $i;
     $document = new Document($documentUrl, true);
 
-    foreach($document->find('.arl_hw') as $element){
+    foreach ($document->find('.arl_hw') as $element) {
         echo $element->text();
-        $writer->addRow($element->text());
+        $singleRow = [$element->text()];
+        $writer->addRow($singleRow);
     }
 }
 

@@ -49,6 +49,10 @@ foreach ($entriesSelectorUrl as $entrySelectorUrl) {
             $entryName = substr($entry, 0, strrpos($entry, '                                            ('));
             $pos = substr($entry, strrpos($entry, '                                            (') + strlen('                                            ('));
             $pos = substr($pos, 0, -1);
+            if ($entryName == '') {
+                $entryName = $entry;
+                $pos = '';
+            }
 
             $singleRow = [$entryName, $pos];
             $writer->addRow($singleRow);

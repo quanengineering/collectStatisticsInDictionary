@@ -44,13 +44,39 @@ do {
     foreach ($document->find('a') as $element) {
 
         $entry = $element->text();
-        $entryName = substr($entry, 0, strpos($entry, ' '));
+        $entryName = $entry;
+        $posList = array(
+            'adjective',
+            'adverb',
+            'auxiliary verb',
+            'conjunction',
+            'indefinite article',
+            'definite article',
+            'predeterminer',
+            'determiner',
+            'det',
+            'interjection',
+            'modal verb',
+            'noun',
+            'number',
+            'prefix',
+            'preposition',
+            'pronoun',
+            'suffix',
+            'verb'
+        );
+        foreach($posList as $element){
+            if(substr($entryName, 0, strpos($entryName, $element)) != ''){
+                $entryName = substr($entryName, 0, strpos($entryName, $element));
+            }
+        }
+        $entryName = trim($entryName);
+
+        $pos = substr($entry, strpos($entry, $entryName) + strlen($entryName));
+        $pos = trim($pos);
+
         if (count($elements = $element->find('sup')) != 0) {
             $entryName = substr($entryName, 0, -1);
-        }
-        $pos = substr($entry, strpos($entry, ' ') + strlen(' '));
-        if (!$pos) {
-            $pos = '';
         }
 
         $alphaKey = $element->getAttribute('data-alphakey');

@@ -44,11 +44,11 @@ do {
     foreach ($document->find('a') as $element) {
 
         $entry = $element->text();
-        $entryName = substr($entry, 0, strrpos($entry, ' '));
+        $entryName = substr($entry, 0, strpos($entry, ' '));
         if (count($elements = $element->find('sup')) != 0) {
             $entryName = substr($entryName, 0, -1);
         }
-        $pos = substr($entry, strrpos($entry, ' ') + strlen(' '));
+        $pos = substr($entry, strpos($entry, ' ') + strlen(' '));
         if (!$pos) {
             $pos = '';
         }
@@ -78,7 +78,7 @@ do {
 
             $entry_detail_document = new Document($entry_detail);
             //check if word is NOT an encyclopaedic entry
-            if (count($elements = $entry_detail_document->find("//span[contains(@type, 'encyc')]", Query::TYPE_XPATH)) == 0) {
+//            if (count($elements = $entry_detail_document->find("//span[contains(@type, 'encyc')]", Query::TYPE_XPATH)) == 0) {
 
                 $word = $entry_detail_document->find('.hwd')[0];
                 echo 'Word: ' . $word->text() . PHP_EOL;
@@ -103,7 +103,7 @@ do {
                     }
                 }
 
-            }
+//            }
         }
         $count_total_word++;
 

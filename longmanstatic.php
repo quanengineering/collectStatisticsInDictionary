@@ -65,9 +65,9 @@ do {
             'suffix',
             'verb'
         );
-        foreach($posList as $element){
-            if(substr($entryName, 0, strpos($entryName, $element)) != ''){
-                $entryName = substr($entryName, 0, strpos($entryName, $element));
+        foreach($posList as $item){
+            if(substr($entryName, 0, strpos($entryName, $item)) != ''){
+                $entryName = substr($entryName, 0, strpos($entryName, $item));
             }
         }
         $entryName = trim($entryName);

@@ -43,42 +43,6 @@ do {
     $document = new Document($response);
     foreach ($document->find('a') as $element) {
 
-        $entry = $element->text();
-        $entryName = $entry;
-        $posList = array(
-            'adjective',
-            'adverb',
-            'auxiliary verb',
-            'conjunction',
-            'indefinite article',
-            'definite article',
-            'predeterminer',
-            'determiner',
-            'det',
-            'interjection',
-            'modal verb',
-            'noun',
-            'number',
-            'prefix',
-            'preposition',
-            'pronoun',
-            'suffix',
-            'verb'
-        );
-        foreach($posList as $item){
-            if(substr($entryName, 0, strpos($entryName, $item)) != ''){
-                $entryName = substr($entryName, 0, strpos($entryName, $item));
-            }
-        }
-        $entryName = trim($entryName);
-
-        $pos = substr($entry, strpos($entry, $entryName) + strlen($entryName));
-        $pos = trim($pos);
-
-        if (count($elements = $element->find('sup')) != 0) {
-            $entryName = substr($entryName, 0, -1);
-        }
-
         $alphaKey = $element->getAttribute('data-alphakey');
 
         //check if word is an important word
@@ -106,9 +70,15 @@ do {
             //check if word is NOT an encyclopaedic entry
 //            if (count($elements = $entry_detail_document->find("//span[contains(@type, 'encyc')]", Query::TYPE_XPATH)) == 0) {
 
-                $word = $entry_detail_document->find('.hwd')[0];
-                echo 'Word: ' . $word->text() . PHP_EOL;
+                $entryName = $entry_detail_document->find('.hwd')[0]->text();
+                echo 'Word: ' . $entryName . PHP_EOL;
                 $count_word_is_not_encyclopaedic_entry++;
+
+                $pos = '';
+                foreach($entry_detail_document->find('.pos') as $item){
+                    $pos = $pos . $item->text();
+                }
+                $pos = trim($pos);
 
                 foreach ($entry_detail_document->find('.sense') as $element) {
                     if (count($elements = $element->find('.subsense')) != 0) {

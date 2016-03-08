@@ -74,9 +74,9 @@ do {
                 echo 'Word: ' . $entryName . PHP_EOL;
                 $count_word_is_not_encyclopaedic_entry++;
 
-                $pos = '';
-                foreach($entry_detail_document->find('.pos') as $item){
-                    $pos = $pos . $item->text();
+                $pos = substr($element->text(), strpos($element->text(), $entryName) + strlen($entryName));
+                if (count($elements = $element->find('sup')) != 0) {
+                    $pos = substr($pos, 1);
                 }
                 $pos = trim($pos);
 

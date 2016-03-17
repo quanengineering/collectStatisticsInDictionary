@@ -45,47 +45,50 @@ $writer->addRow($headerRow);
 $count = 0;
 foreach ($wordsUrl as $wordUrl) {
 
-    $wordDocument = new Document($wordUrl, true);
+    if ($wordUrl != 'http://www.macmillandictionary.com/dictionary/british/huntington-s-disease') {
 
-    $entryName = $wordDocument->find('h1 .BASE')[0]->text();
+        $wordDocument = new Document($wordUrl, true);
 
-    if (count($elements = $wordDocument->find('.PART-OF-SPEECH')) != 0) {
-        $pos = trim($wordDocument->find('.PART-OF-SPEECH')[0]->text());
-    } else {
-        $pos = '';
-    }
+        $entryName = $wordDocument->find('h1 .BASE')[0]->text();
 
-    if (count($elements = $wordDocument->find('.redword')) != 0) {
-        $frequency = $wordDocument->find('.icon_star');
-        $frequency = count($frequency);
-    } else {
-        $frequency = '';
-    }
+        if (count($elements = $wordDocument->find('.PART-OF-SPEECH')) != 0) {
+            $pos = trim($wordDocument->find('.PART-OF-SPEECH')[0]->text());
+        } else {
+            $pos = '';
+        }
 
-    if (count($elements = $wordDocument->find('.moreButton')) != 0) {
-        foreach ($wordDocument->find('.moreButton') as $element) {
-            $singleRow = [$entryName, $pos, $frequency, $element->getAttribute('href')];
+        if (count($elements = $wordDocument->find('.redword')) != 0) {
+            $frequency = $wordDocument->find('.icon_star');
+            $frequency = count($frequency);
+        } else {
+            $frequency = '';
+        }
+
+        if (count($elements = $wordDocument->find('.moreButton')) != 0) {
+            foreach ($wordDocument->find('.moreButton') as $element) {
+                $singleRow = [$entryName, $pos, $frequency, $element->getAttribute('href')];
+                $writer->addRow($singleRow);
+            }
+        } else {
+            $singleRow = [$entryName, $pos, $frequency];
             $writer->addRow($singleRow);
         }
-    } else {
-        $singleRow = [$entryName, $pos, $frequency];
-        $writer->addRow($singleRow);
-    }
 
-//    if (count($elements = $wordDocument->find('.ONEBOX-HEAD')) != 0) {
-//        foreach ($wordDocument->find('.ONEBOX-HEAD') as $element) {
-//            $element = $element->text();
-//            $singleRow = [$entryName, $pos, $frequency, '', substr($element, 0, strrpos($element, ':'))];
+//        if (count($elements = $wordDocument->find('.ONEBOX-HEAD')) != 0) {
+//            foreach ($wordDocument->find('.ONEBOX-HEAD') as $element) {
+//                $element = $element->text();
+//                $singleRow = [$entryName, $pos, $frequency, '', substr($element, 0, strrpos($element, ':'))];
+//                $writer->addRow($singleRow);
+//            }
+//        } else {
+//            $singleRow = [$entryName, $pos, $frequency];
 //            $writer->addRow($singleRow);
 //        }
-//    } else {
-//        $singleRow = [$entryName, $pos, $frequency];
-//        $writer->addRow($singleRow);
-//    }
 
-    $count++;
-    echo 'Number of words: ' . $count . PHP_EOL;
-    echo $entryName . PHP_EOL;
+        $count++;
+        echo 'Number of words: ' . $count . PHP_EOL;
+        echo $entryName . PHP_EOL;
+    }
 }
 
 $writer->close();

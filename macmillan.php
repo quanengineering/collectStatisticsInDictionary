@@ -45,7 +45,7 @@ $writer->addRow($headerRow);
 $count = 0;
 foreach ($wordsUrl as $wordUrl) {
 
-    if ($wordUrl != 'http://www.macmillandictionary.com/dictionary/british/huntington-s-disease') {
+    if ($wordUrl != 'http://www.macmillandictionary.com/dictionary/british/huntington-s-disease' && $wordUrl != 'http://www.macmillandictionary.com/dictionary/british/za-atar') {
 
         $wordDocument = new Document($wordUrl, true);
 

@@ -49,7 +49,11 @@ foreach ($wordsUrl as $wordUrl) {
 
     $entryName = $wordDocument->find('h1 .BASE')[0]->text();
 
-    $pos = trim($wordDocument->find('.PART-OF-SPEECH')[0]->text());
+    if (count($elements = $wordDocument->find('.PART-OF-SPEECH')) != 0) {
+        $pos = trim($wordDocument->find('.PART-OF-SPEECH')[0]->text());
+    } else {
+        $pos = '';
+    }
 
     if (count($elements = $wordDocument->find('.redword')) != 0) {
         $frequency = $wordDocument->find('.icon_star');

@@ -65,7 +65,10 @@ foreach ($wordsUrl as $wordUrl) {
         }
 
         if (count($elements = $wordDocument->find('.SUBJECT-AREA')) != 0) {
-            $subjectArea = $wordDocument->find('.SUBJECT-AREA');
+            $subjectArea = '';
+            foreach($wordDocument->find('.SUBJECT-AREA') as $element){
+                $subjectArea .= $element->text() . ' ';
+            }
             $subjectArea = trim($subjectArea);
         } else {
             $subjectArea = '';

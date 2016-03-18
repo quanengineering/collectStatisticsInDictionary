@@ -39,7 +39,7 @@ foreach ($letters->find('#letters a') as $letterUrl) {
 
 $writer = WriterFactory::create(Type::XLSX);
 $writer->openToFile(str_replace('.php', '.xlsx', __FILE__));
-$headerRow = ['Entry', 'Part of Speech', 'Frequency', 'Thesaurus', 'Sidebox'];
+$headerRow = ['Entry', 'Part of Speech', 'Frequency', 'Subject area', 'Thesaurus', 'Sidebox'];
 $writer->addRow($headerRow);
 
 $count = 0;
@@ -64,13 +64,20 @@ foreach ($wordsUrl as $wordUrl) {
             $frequency = '';
         }
 
+        if (count($elements = $wordDocument->find('.SUBJECT-AREA')) != 0) {
+            $subjectArea = $wordDocument->find('.SUBJECT-AREA');
+            $subjectArea = trim($subjectArea);
+        } else {
+            $subjectArea = '';
+        }
+
         if (count($elements = $wordDocument->find('.moreButton')) != 0) {
             foreach ($wordDocument->find('.moreButton') as $element) {
-                $singleRow = [$entryName, $pos, $frequency, $element->getAttribute('href')];
+                $singleRow = [$entryName, $pos, $frequency, $subjectArea, $element->getAttribute('href')];
                 $writer->addRow($singleRow);
             }
         } else {
-            $singleRow = [$entryName, $pos, $frequency];
+            $singleRow = [$entryName, $pos, $frequency, $subjectArea];
             $writer->addRow($singleRow);
         }
 

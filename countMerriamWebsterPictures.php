@@ -40,20 +40,21 @@ $totalEntries = 0;
 foreach ($wordsUrl as $wordUrl) {
 
     $wordDocument = new Document($wordUrl, true);
+    if (count($elements = $wordDocument->find('#ld_entries_v2_mainh')) != 0) { //check if entry has name
 
-    $entryName = $wordDocument->find('#ld_entries_v2_mainh')[0]->text();
+        $entryName = $wordDocument->find('#ld_entries_v2_mainh')[0]->text();
 
-    $totalEntries++;
+        $totalEntries++;
 
-    if (count($elements = $wordDocument->find('.arts')) != 0) { //check if word has pictures
+        if (count($elements = $wordDocument->find('.arts')) != 0) { //check if word has pictures
 
-        $totalEntriesHavePictures++;
+            $totalEntriesHavePictures++;
 
-        echo 'Current entry has pictures: ' . $entryName . PHP_EOL;
-        echo 'Total entries have pictures: ' . $totalEntriesHavePictures . PHP_EOL;
-        echo 'Total entries: ' . $totalEntries . PHP_EOL;
+            echo 'Current entry has pictures: ' . $entryName . PHP_EOL;
+            echo 'Total entries have pictures: ' . $totalEntriesHavePictures . PHP_EOL;
+            echo 'Total entries: ' . $totalEntries . PHP_EOL;
+        }
     }
-
 }
 
 $endTime = microtime(true);

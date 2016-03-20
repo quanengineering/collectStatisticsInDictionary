@@ -56,9 +56,8 @@ foreach ($wordsUrl as $wordUrl) {
                     $numberOfEntriesHaveNounForms++;
 
                     echo 'Current entry have noun forms: ' . $entryName . PHP_EOL;
-                    echo 'Total noun entries: ' . $totalNounEntries . PHP_EOL;
                     echo 'Total entries have noun forms: ' . $numberOfEntriesHaveNounForms . PHP_EOL;
-
+                    echo 'Total noun entries: ' . $totalNounEntries . PHP_EOL;
                 }
             } elseif ($pos == 'verb') {
                 $totalVerbEntries++;
@@ -67,8 +66,8 @@ foreach ($wordsUrl as $wordUrl) {
                     $numberOfEntriesHaveVerbForms++;
 
                     echo 'Current entry have verb forms: ' . $entryName . PHP_EOL;
-                    echo 'Total verb entries: ' . $totalVerbEntries . PHP_EOL;
                     echo 'Total entries have verb forms: ' . $numberOfEntriesHaveVerbForms . PHP_EOL;
+                    echo 'Total verb entries: ' . $totalVerbEntries . PHP_EOL;
                 }
             }
 

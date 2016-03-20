@@ -38,9 +38,10 @@ foreach ($letters->find('#letters a') as $letterUrl) {
 $totalEntriesHavePictures = 0;
 $totalEntries = 0;
 foreach ($wordsUrl as $wordUrl) {
-    if ($wordUrl != 'http://www.oxfordlearnersdictionaries.com/definition/english/nancy-drew') {
 
-        $wordDocument = new Document($wordUrl, true);
+    $wordDocument = new Document($wordUrl, true);
+
+    if (count($elements = $wordDocument->find('.h')) != 0) { //check if word has name
 
         $entryName = $wordDocument->find('.h')[0]->text();
 

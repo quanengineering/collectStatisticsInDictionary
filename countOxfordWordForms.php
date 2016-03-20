@@ -5,6 +5,7 @@ $startTime = microtime(true);
 require "vendor/autoload.php";
 
 use DiDom\Document;
+use DiDom\Query;
 
 //error handler function
 function customError($errno, $errstr)
@@ -46,11 +47,11 @@ foreach ($wordsUrl as $wordUrl) {
 
         $entryName = $wordDocument->find('.h')[0]->text();
 
-        if (count($elements = $wordDocument->find('.webtop-g .pos')) != 0) {
-            $pos = $wordDocument->find('.webtop-g .pos')[0]->text();
+        if (count($elements = $wordDocument->find('.webtop-g .pos')) != 0) { //check if word has part of speech
+            $pos = $wordDocument->find('.webtop-g .pos')[0]->text(); //find part of speech of word
             if ($pos == 'noun') {
                 $totalNounEntries++;
-                if (count($elements = $wordDocument->find('.if-g')) != 0) {
+                if (count($elements = $wordDocument->find('.if-g')) != 0) { //check if word has plural
 
                     $numberOfEntriesHaveNounForms++;
 
@@ -61,7 +62,7 @@ foreach ($wordsUrl as $wordUrl) {
                 }
             } elseif ($pos == 'verb') {
                 $totalVerbEntries++;
-                if (count($elements = $wordDocument->find('.vp-g')) != 0) {
+                if (count($elements = $wordDocument->find("//span[contains(@unbox, 'verbforms')]", Query::TYPE_XPATH)) != 0) { //check if word has verb forms
 
                     $numberOfEntriesHaveVerbForms++;
 

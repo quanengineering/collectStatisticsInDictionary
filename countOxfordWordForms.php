@@ -36,9 +36,9 @@ foreach ($letters->find('#letters a') as $letterUrl) {
     }
 }
 
-$numberOfEntriesHaveNounForms = 0;
+$totalEntriesHaveNounForms = 0;
 $totalNounEntries = 0;
-$numberOfEntriesHaveVerbForms = 0;
+$totalEntriesHaveVerbForms = 0;
 $totalVerbEntries = 0;
 foreach ($wordsUrl as $wordUrl) {
     if ($wordUrl != 'http://www.oxfordlearnersdictionaries.com/definition/english/nancy-drew') {
@@ -53,20 +53,20 @@ foreach ($wordsUrl as $wordUrl) {
                 $totalNounEntries++;
                 if (count($elements = $wordDocument->find('.if-g')) != 0) { //check if word has plural
 
-                    $numberOfEntriesHaveNounForms++;
+                    $totalEntriesHaveNounForms++;
 
                     echo 'Current entry have noun forms: ' . $entryName . PHP_EOL;
-                    echo 'Total entries have noun forms: ' . $numberOfEntriesHaveNounForms . PHP_EOL;
+                    echo 'Total entries have noun forms: ' . $totalEntriesHaveNounForms . PHP_EOL;
                     echo 'Total noun entries: ' . $totalNounEntries . PHP_EOL;
                 }
             } elseif ($pos == 'verb') {
                 $totalVerbEntries++;
                 if (count($elements = $wordDocument->find("//span[contains(@unbox, 'verbforms')]", Query::TYPE_XPATH)) != 0) { //check if word has verb forms
 
-                    $numberOfEntriesHaveVerbForms++;
+                    $totalEntriesHaveVerbForms++;
 
                     echo 'Current entry have verb forms: ' . $entryName . PHP_EOL;
-                    echo 'Total entries have verb forms: ' . $numberOfEntriesHaveVerbForms . PHP_EOL;
+                    echo 'Total entries have verb forms: ' . $totalEntriesHaveVerbForms . PHP_EOL;
                     echo 'Total verb entries: ' . $totalVerbEntries . PHP_EOL;
                 }
             }

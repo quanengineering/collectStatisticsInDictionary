@@ -24,10 +24,10 @@ $wordsUrl = array();
 
 foreach ($alphalinks->find('.alphalinks a') as $alphalink) {
 
-    $groupEntries = new Document($alphalink->getAttribute('href'), true);
+    $groupEntries = new Document('http://learnersdictionary.com' . $alphalink->getAttribute('href'), true);
 
     foreach ($groupEntries->find('.entries a') as $groupEntry) {
-        $entry = new Document($groupEntry->getAttribute('href'), true);
+        $entry = new Document('http://learnersdictionary.com' . $groupEntry->getAttribute('href'), true);
 
         foreach ($entry->find('.entries a') as $wordUrl) {
             $wordsUrl[] = 'http://learnersdictionary.com' . $wordUrl->getAttribute('href');

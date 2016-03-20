@@ -55,6 +55,22 @@ class QueryTest extends TestCase
         Query::compile('li:unknown-pseudo-class');
     }
 
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testEmptyNthExpression()
+    {
+        Query::compile('li:nth-child()');
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testUnknownNthExpression()
+    {
+        Query::compile('li:nth-child(foo)');
+    }
+
     public function testCompileXpath()
     {
         $this->assertEquals('//div', Query::compile('//div', Query::TYPE_XPATH));
@@ -100,6 +116,10 @@ class QueryTest extends TestCase
             ['*[foo=bar]', '//*[@foo="bar"]'],
             ['*[foo="bar"]', '//*[@foo="bar"]'],
             ['*[foo=\'bar\']', '//*[@foo="bar"]'],
+            ['*[^data-]', '//*[@*[starts-with(name(), "data-")]]'],
+            ['a[href^=https]', '//a[starts-with(@href, "https")]'],
+            ['img[src$=png]', '//img[ends-with(@src, "png")]'],
+            ['a[href*=exapmle.com]', '//a[contains(@href, "exapmle.com")]'],
             ['foo bar baz', '//foo//bar//baz'],
             ['foo > bar > baz', '//foo/bar/baz'],
             ['input, textarea, select', '//input|//textarea|//select'],
@@ -116,6 +136,9 @@ class QueryTest extends TestCase
             ['li:nth-child(3n-1)', '//li[(position() + 1) mod 3 = 0 and position() >= 1]'],
             ['li:nth-child(n+3)', '//li[(position() - 3) mod 1 = 0 and position() >= 3]'],
             ['li:nth-child(n-3)', '//li[(position() + 3) mod 1 = 0 and position() >= 3]'],
+            ['li:contains(foo)', '//li[lower-case(.) = lower-case("foo")]'],
+            ['li:contains("foo")', '//li[lower-case(.) = lower-case("foo")]'],
+            ['li:contains(\'foo\')', '//li[lower-case(.) = lower-case("foo")]'],
         ];
 
         return $compiled;

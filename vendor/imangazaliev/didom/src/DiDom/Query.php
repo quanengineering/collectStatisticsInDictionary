@@ -109,10 +109,7 @@ class Query
         // if the attributes specified
         if (isset($segments['attributes'])) {
             foreach ($segments['attributes'] as $name => $value) {
-                // if specified only the attribute name
-                $value = $value === null ? '' : sprintf('="%s"', $value);
-
-                $attributes[] = '@'.$name.$value;
+                $attributes[] = self::convertAttribute($name, $value);
             }
         }
 
@@ -137,6 +134,37 @@ class Query
     }
 
     /**
+     * @param string  $name Attribute name.
+     * @param string  $value Attribute value.
+     * 
+     * @return string
+     */
+    protected static function convertAttribute($name, $value)
+    {
+        if (substr($name, 0, 1) === '^') {
+            return sprintf('@*[starts-with(name(), "%s")]', substr($name, 1));
+        }
+
+        switch (substr($name, -1)) {
+            case '^':
+                $xpath = sprintf('starts-with(@%s, "%s")', substr($name, 0, -1), $value);
+                break;
+            case '$':
+                $xpath = sprintf('ends-with(@%s, "%s")', substr($name, 0, -1), $value);
+                break;
+            case '*':
+                $xpath = sprintf('contains(@%s, "%s")', substr($name, 0, -1), $value);
+                break;
+            default:
+                // if specified only the attribute name
+                $xpath = $value === null ? '@'.$name : sprintf('@%s="%s"', $name, $value);
+                break;
+        }
+
+        return $xpath;
+    }
+
+    /**
      * Converts a CSS pseudo-class into an XPath expression.
      * 
      * @param  string $pseudo pseudo-class
@@ -148,35 +176,63 @@ class Query
      */
     protected static function convertPseudo($pseudo, $expression = null)
     {
-        if ('first-child' === $pseudo) {
-            return 'position() = 1';
-        } elseif ('last-child' === $pseudo) {
-            return 'position() = last()';
-        } elseif ('empty' === $pseudo) {
-            return 'count(descendant::*) = 0';
-        } elseif ('not-empty' === $pseudo) {
-            return 'count(descendant::*) > 0';
-        } elseif ('nth-child' === $pseudo) {
-            if ('' !== $expression) {
-                if ('odd' === $expression) {
-                    return '(position() -1) mod 2 = 0 and position() >= 1';
-                } elseif ('even' === $expression) {
-                    return 'position() mod 2 = 0 and position() >= 0';
-                } elseif (is_numeric($expression)) {
-                    return sprintf('position() = %d', $expression);
-                } elseif (preg_match("/^(?P<mul>[0-9]?n)(?:(?P<sign>\+|\-)(?P<pos>[0-9]+))?$/is", $expression, $segments)) {
-                    if (isset($segments['mul'])) {
-                        $segments['mul'] = strtolower($segments['mul'] === 'n') ? 1 : trim(strtolower($segments['mul']), 'n');
-                        $segments['sign'] = (isset($segments['sign']) and $segments['sign'] === '+') ? '-' : '+';
-                        $segments['pos'] = isset($segments['pos']) ? $segments['pos'] : 0;
-
-                        return sprintf('(position() %s %d) mod %d = 0 and position() >= %d', $segments['sign'], $segments['pos'], $segments['mul'], $segments['pos']);
-                    }
-                }
-            }
+        switch ($pseudo) {
+            case 'first-child':
+                return 'position() = 1';
+                break;
+            case 'last-child':
+                return 'position() = last()';
+                break;
+            case 'empty':
+                return 'count(descendant::*) = 0';
+                break;
+            case 'not-empty':
+                return 'count(descendant::*) > 0';
+                break;
+            case 'nth-child':
+                return self::convertNthChildExpression($expression);
+                break;
+            case 'contains':
+                return sprintf('lower-case(.) = lower-case("%s")', trim($expression, '\'"'));
+                break;
         }
 
         throw new RuntimeException('Invalid selector: unknown pseudo-class');
+    }
+
+    /**
+     * Converts nth-child expression into an XPath expression.
+     * 
+     * @param  string $expression nth-expression
+     * 
+     * @return string
+     * 
+     * @throws \RuntimeException if passed nth-child is empty
+     * @throws \RuntimeException if passed an unknown nth-child expression
+     */
+    protected static function convertNthChildExpression($expression)
+    {
+        if ($expression === '') {
+            throw new RuntimeException('Invalid selector: nth-child expression must not be empty');
+        }
+
+        if ($expression === 'odd') {
+            return '(position() -1) mod 2 = 0 and position() >= 1';
+        } elseif ($expression === 'even') {
+            return 'position() mod 2 = 0 and position() >= 0';
+        } elseif (is_numeric($expression)) {
+            return sprintf('position() = %d', $expression);
+        } elseif (preg_match("/^(?P<mul>[0-9]?n)(?:(?P<sign>\+|\-)(?P<pos>[0-9]+))?$/is", $expression, $segments)) {
+            if (isset($segments['mul'])) {
+                $segments['mul'] = strtolower($segments['mul'] === 'n') ? 1 : trim(strtolower($segments['mul']), 'n');
+                $segments['sign'] = (isset($segments['sign']) and $segments['sign'] === '+') ? '-' : '+';
+                $segments['pos'] = isset($segments['pos']) ? $segments['pos'] : 0;
+
+                return sprintf('(position() %s %d) mod %d = 0 and position() >= %d', $segments['sign'], $segments['pos'], $segments['mul'], $segments['pos']);
+            }
+        }
+
+        throw new RuntimeException('Invalid selector: invalid nth-child expression');
     }
 
     /**
@@ -224,7 +280,7 @@ class Query
 
                 foreach ($attributes as $attribute) {
                     if ($attribute !== '') {
-                        list($name, $value) = array_pad(explode('=', $attribute), 2, null);
+                        list($name, $value) = array_pad(explode('=', $attribute, 2), 2, null);
 
                         // equal null if specified only the attribute name
                         $result['attributes'][$name] = is_string($value) ? trim($value, '\'"') : null;

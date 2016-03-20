@@ -1,16 +1,16 @@
 {
-  "name": "vendor_name/package_name",
-  "description": "description_text",
+  "name": "iamquan/collectStatisticsInDictionary",
+  "description": "Crawlers count entries listed in Oxford Advanced Learner’s Dictionary, Cambridge Advanced Learner’s Dictionary & Thesaurus, English Grammar Today, Password English-Vietnamese Dictionary, Longman Dictionary of Contemporary English, Longman Collocations Dictionary and Thesaurus, Macmillan English Dictionary, Merriam-Webster's Learners Dictionary, Merriam-Webster's Visual Dictionaries",
   "minimum-stability": "stable",
-  "license": "proprietary",
+  "license": "ISC",
   "authors": [
     {
-      "name": "author's name",
-      "email": "email@example.com"
+      "name": "Quan Nguyen",
+      "email": "sendquananemail@gmail.com"
     }
   ],
   "require": {
-    "imangazaliev/didom": "1.5.1",
+    "imangazaliev/didom": "1.6.3",
     "box/spout": "v2.4.2"
   }
 }

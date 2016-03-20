@@ -17,15 +17,6 @@ class ElementTest extends TestCase
         new Element('span', 'hello', null);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testIsWithInvalidArgument()
-    {
-        $element = new Element('span', 'hello');
-        $element->is(null);
-    }
-
     public function testConstructor()
     {
         $element = new Element('input', '', ['name' => 'username', 'value' => 'John']);
@@ -42,6 +33,36 @@ class ElementTest extends TestCase
         $element = new Element($node);
 
         $this->assertEquals($node, $element->getNode());
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testAppendChildWithInvalidArgument()
+    {
+        $element = new Element('span', 'hello');
+
+        $element->appendChild('foo');
+    }
+
+    public function testAppendChild()
+    {
+        $list = new Element('ul');
+
+        $this->assertCount(0, $list->find('li'));
+
+        $node = new Element('li', 'foo');
+        $list->appendChild($node);
+
+        $this->assertCount(1, $list->find('li'));
+
+        $items = [];
+        $items[] = new Element('li', 'bar');
+        $items[] = new Element('li', 'baz');
+
+        $list->appendChild($items);
+
+        $this->assertCount(3, $list->find('li'));
     }
 
     public function testHas()
@@ -211,6 +232,51 @@ class ElementTest extends TestCase
         $this->assertEquals('<span>hello</span>', $element->html());
     }
 
+    public function testInnerHtml()
+    {
+        $html = $this->loadFixture('posts.html');
+        $document = new Document($html, false);
+
+        $this->assertTrue(is_string($document->find('body')[0]->innerHtml()));
+    }
+
+    public function testHtmlWithOptions()
+    {
+        $html = '<html><body><span></span></body></html>';
+        
+        $document = new Document();
+        $document->loadHtml($html);
+
+        $element = $document->find('span')[0];
+
+        $this->assertEquals('<span/>', $element->html());
+        $this->assertEquals('<span></span>', $element->html(LIBXML_NOEMPTYTAG));
+    }
+
+    public function testXml()
+    {
+        $element = new Element('span', 'hello');
+
+        $prolog = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+
+        $this->assertEquals($prolog.'<span>hello</span>', $element->xml());
+    }
+
+    public function testXmlWithOptions()
+    {
+        $html = '<html><body><span></span></body></html>';
+        
+        $document = new Document();
+        $document->loadHtml($html);
+
+        $element = $document->find('span')[0];
+
+        $prolog = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+
+        $this->assertEquals($prolog.'<span/>', $element->xml());
+        $this->assertEquals($prolog.'<span></span>', $element->xml(LIBXML_NOEMPTYTAG));
+    }
+
     public function testGetText()
     {
         $node = $this->createNode('span', 'hello');
@@ -236,6 +302,15 @@ class ElementTest extends TestCase
         $this->assertFalse($element->is($element2));
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testIsWithInvalidArgument()
+    {
+        $element = new Element('span', 'hello');
+        $element->is(null);
+    }
+
     public function testParent()
     {
         $html = $this->loadFixture('posts.html');
@@ -243,6 +318,13 @@ class ElementTest extends TestCase
         $element = $document->createElement('span', 'value');
 
         $this->assertEquals($document->getDocument(), $element->parent()->getDocument());
+    }
+
+    public function testParentWithoutOwner()
+    {
+        $element = new Element(new \DOMElement('span', 'hello'));
+
+        $this->assertNull($element->parent());
     }
 
     public function testRemove()
@@ -277,6 +359,40 @@ class ElementTest extends TestCase
         $this->assertEquals($first->getNode(), $first->replace($third, false)->getNode());
         $this->assertEquals($third->getNode(), $document->find('li')[0]->getNode());
         $this->assertCount(2, $document->find('li'));
+    }
+
+    public function testReplaceWithDifferentDocuments()
+    {
+        $html = '<ul><li>One</li><li>Two</li><li>Three</li></ul>';
+
+        $document = new Document($html, false);
+        $document2 = new Document($html, false);
+
+        $first = $document->find('li')[0];
+        $third = $document2->find('li')[2];
+
+        $first->replace($third);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testReplaceWithInvalidArgument()
+    {
+        $html = '<ul><li>One</li><li>Two</li><li>Three</li></ul>';
+
+        $document = new Document($html, false);
+
+        $document->find('li')[0]->replace(null);
+    }
+
+    public function testCloneNode()
+    {
+        $element = new Element('input');
+
+        $cloned = $element->cloneNode(true);
+
+        $this->assertFalse($element->is($cloned));
     }
 
     public function testGetNode()

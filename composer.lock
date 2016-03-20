@@ -4,7 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "119faf1e48fe7e536597bb035d745ad2",
+    "hash": "da1b52de309e32d6927c01449e94176d",
+    "content-hash": "fa1389737d5abed7b3e300b15211c316",
     "packages": [
         {
             "name": "box/spout",
@@ -78,16 +79,16 @@
         },
         {
             "name": "imangazaliev/didom",
-            "version": "1.5.1",
+            "version": "1.6.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Imangazaliev/DiDOM.git",
-                "reference": "1a12f43bce513a5f45a2e4c79bcda96b678d70ef"
+                "reference": "e492feae44321e2f4882f6e9466614732822f008"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Imangazaliev/DiDOM/zipball/1a12f43bce513a5f45a2e4c79bcda96b678d70ef",
-                "reference": "1a12f43bce513a5f45a2e4c79bcda96b678d70ef",
+                "url": "https://api.github.com/repos/Imangazaliev/DiDOM/zipball/e492feae44321e2f4882f6e9466614732822f008",
+                "reference": "e492feae44321e2f4882f6e9466614732822f008",
                 "shasum": ""
             },
             "require": {
@@ -117,9 +118,10 @@
             "keywords": [
                 "didom",
                 "html",
-                "parser"
+                "parser",
+                "xml"
             ],
-            "time": "2016-01-05 16:55:43"
+            "time": "2016-03-16 15:41:59"
         }
     ],
     "packages-dev": [],

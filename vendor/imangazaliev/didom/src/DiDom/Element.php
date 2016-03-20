@@ -3,6 +3,7 @@
 namespace DiDom;
 
 use DOMDocument;
+use DOMElement;
 use InvalidArgumentException;
 
 class Element
@@ -37,6 +38,45 @@ class Element
         foreach ($attributes as $name => $value) {
             $this->setAttribute($name, $value);
         }
+    }
+
+    /**
+     * Adds new child at the end of the children.
+     * 
+     * @param  \DiDom\Element|\DOMNode|array $nodes The appended child.
+     *
+     * @return \DiDom\Element
+     *
+     * @throws \InvalidArgumentException if the provided argument is not an instance of \DOMNode or \DiDom\Element
+     */
+    public function appendChild($nodes)
+    {
+        $nodes = is_array($nodes) ? $nodes : [$nodes];
+
+        foreach ($nodes as $node) {
+            if ($node instanceof Element) {
+                $node = $node->getNode();
+            }
+
+            if (!$node instanceof \DOMNode) {
+                throw new InvalidArgumentException(sprintf('Argument 1 passed to %s must be an instance of %s\Element or DOMNode, %s given', __METHOD__, __NAMESPACE__, (is_object($node) ? get_class($node) : gettype($node))));
+            }
+
+            libxml_use_internal_errors(true);
+            libxml_disable_entity_loader(true);
+
+            $cloned = $node->cloneNode(true);
+            $newNode = $this->node->ownerDocument->importNode($cloned, true);
+
+            $this->node->appendChild($newNode);
+
+            libxml_clear_errors();
+
+            libxml_disable_entity_loader(false);
+            libxml_use_internal_errors(false);
+        }
+
+        return $this;
     }
 
     /**
@@ -155,13 +195,49 @@ class Element
     }
 
     /**
-     * Dumps the internal document into a string using HTML formatting.
+     * Dumps the node into a string using HTML formatting.
+     * 
+     * @param  int $options Additional options
      * 
      * @return string The node html
      */
-    public function html()
+    public function html($options = 0)
     {
-        return $this->toDocument()->html();
+        return $this->toDocument()->html($options);
+    }
+
+    /**
+     * Dumps the node descendants into a string using HTML formatting.
+     * 
+     * @param  int $options Additional options
+     * 
+     * @return string
+     */
+    public function innerHtml($options = 0)
+    {
+        $childrenHtml = [];
+        $children = $this->node->childNodes;
+
+        foreach ($children as $child) 
+        {
+            $childrenHtml[] = $child->ownerDocument->saveXml($child, $options);
+        }
+
+        $html = implode('', $childrenHtml);
+
+        return html_entity_decode($html);
+    }
+
+    /**
+     * Dumps the node into a string using XML formatting.
+     * 
+     * @param  int $options Additional options
+     * 
+     * @return string The node xml
+     */
+    public function xml($options = 0)
+    {
+        return $this->toDocument()->xml($options);
     }
 
     /**
@@ -221,7 +297,9 @@ class Element
      */
     public function parent()
     {
-        return new Document($this->node->ownerDocument);
+        if ($this->node->ownerDocument !== null) {
+            return new Document($this->node->ownerDocument);
+        }
     }
 
     /**
@@ -250,17 +328,33 @@ class Element
             $newNode = $newNode->getNode();
         }
 
+        if (!$newNode instanceof \DOMElement) {
+            throw new InvalidArgumentException(sprintf('Argument 1 passed to %s must be an instance of %s or DOMElement, %s given', __METHOD__, __CLASS__, (is_object($newNode) ? get_class($newNode) : gettype($newNode))));
+        }
+
         if ($clone) {
             $newNode = $newNode->cloneNode(true);
         }
 
-        if (!$newNode instanceof \DOMElement) {
-            throw new InvalidArgumentException(sprintf('Argument 1 passed to %s must be an instance of %s or DOMElement, %s given', __METHOD__, __CLASS__, (is_object($newNode) ? get_class($newNode) : gettype($newNode))));
+        if (!$this->parent()->is($newNode->ownerDocument)) {
+            $newNode = $this->node->ownerDocument->importNode($newNode, true);
         }
 
         $node = $this->node->parentNode->replaceChild($newNode, $this->node);
 
         return new Element($node);
+    }
+
+    /**
+     * Clones a node.
+     * 
+     * @param  bool $deep Indicates whether to copy all descendant nodes
+     * 
+     * @return \DiDom\Element The cloned node
+     */
+    public function cloneNode($deep = true)
+    {
+        return new Element($this->node->cloneNode($deep));
     }
 
     /**

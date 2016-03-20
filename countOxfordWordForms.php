@@ -40,37 +40,39 @@ $totalNounEntries = 0;
 $numberOfEntriesHaveVerbForms = 0;
 $totalVerbEntries = 0;
 foreach ($wordsUrl as $wordUrl) {
-    $wordDocument = new Document($wordUrl, true);
+    if ($wordUrl != 'http://www.oxfordlearnersdictionaries.com/definition/english/nancy-drew') {
 
-    $entryName = $wordDocument->find('.h')[0]->text();
+        $wordDocument = new Document($wordUrl, true);
 
-    if (count($elements = $wordDocument->find('.webtop-g .pos')) != 0) {
-        $pos = $wordDocument->find('.webtop-g .pos')[0]->text();
-        if ($pos == 'noun') {
-            $totalNounEntries++;
-            if (count($elements = $wordDocument->find('.if-g')) != 0) {
+        $entryName = $wordDocument->find('.h')[0]->text();
 
-                $numberOfEntriesHaveNounForms++;
+        if (count($elements = $wordDocument->find('.webtop-g .pos')) != 0) {
+            $pos = $wordDocument->find('.webtop-g .pos')[0]->text();
+            if ($pos == 'noun') {
+                $totalNounEntries++;
+                if (count($elements = $wordDocument->find('.if-g')) != 0) {
 
-                echo 'Current entry have noun forms: ' . $entryName . PHP_EOL;
-                echo 'Total noun entries: ' . $totalNounEntries . PHP_EOL;
-                echo 'Total entries have noun forms: ' . $numberOfEntriesHaveNounForms . PHP_EOL;
+                    $numberOfEntriesHaveNounForms++;
 
+                    echo 'Current entry have noun forms: ' . $entryName . PHP_EOL;
+                    echo 'Total noun entries: ' . $totalNounEntries . PHP_EOL;
+                    echo 'Total entries have noun forms: ' . $numberOfEntriesHaveNounForms . PHP_EOL;
+
+                }
+            } elseif ($pos == 'verb') {
+                $totalVerbEntries++;
+                if (count($elements = $wordDocument->find('.vp-g')) != 0) {
+
+                    $numberOfEntriesHaveVerbForms++;
+
+                    echo 'Current entry have verb forms: ' . $entryName . PHP_EOL;
+                    echo 'Total verb entries: ' . $totalVerbEntries . PHP_EOL;
+                    echo 'Total entries have verb forms: ' . $numberOfEntriesHaveVerbForms . PHP_EOL;
+                }
             }
-        } elseif ($pos == 'verb') {
-            $totalVerbEntries++;
-            if (count($elements = $wordDocument->find('.vp-g')) != 0) {
 
-                $numberOfEntriesHaveVerbForms++;
-
-                echo 'Current entry have verb forms: ' . $entryName . PHP_EOL;
-                echo 'Total verb entries: ' . $totalVerbEntries . PHP_EOL;
-                echo 'Total entries have verb forms: ' . $numberOfEntriesHaveVerbForms . PHP_EOL;
-            }
         }
-
     }
-
 }
 
 $endTime = microtime(true);

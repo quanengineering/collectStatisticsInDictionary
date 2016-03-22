@@ -83,12 +83,10 @@ foreach ($wordsUrl as $wordUrl) {
 
 }
 
-echo 'Total entries have noun forms: ' . $totalEntriesHaveNounForms . PHP_EOL;
-echo 'Total noun entries: ' . $totalNounEntries . PHP_EOL;
-echo 'Total entries have adjective forms: ' . $totalEntriesHaveAdjectiveForms . PHP_EOL;
-echo 'Total adjective entries: ' . $totalAdjectiveEntries . PHP_EOL;
-echo 'Total entries have verb forms: ' . $totalEntriesHaveVerbForms . PHP_EOL;
-echo 'Total verb entries: ' . $totalVerbEntries . PHP_EOL;
+echo 'Total entries have noun forms/Total noun entries: ' . $totalEntriesHaveNounForms . '/' . $totalNounEntries . PHP_EOL;
+echo 'Total entries have  adjective forms/Total adjective entries: ' . $totalEntriesHaveAdjectiveForms . '/' . $totalAdjectiveEntries . PHP_EOL;
+echo 'Total entries have verb forms/Total verb entries: ' . $totalEntriesHaveVerbForms . '/' . $totalVerbEntries . PHP_EOL;
+echo 'Statistics from Macmillan English Dictionary' . PHP_EOL;
 
 $endTime = microtime(true);
 $executionTime = ($endTime - $startTime) / 60;

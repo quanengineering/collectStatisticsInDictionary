@@ -45,7 +45,6 @@ $totalAdjectiveEntries = 0;
 $irreg = 0;
 foreach ($wordsUrl as $wordUrl) {
 
-    $wordUrl = 'http://dictionary.cambridge.org/dictionary/english/run';
     $wordDocument = new Document($wordUrl, true);
 
     if (count($elements = $wordDocument->find('#dataset-british .headword')) != 0) { //check if word has name

@@ -38,58 +38,61 @@ foreach ($letters->find('#letters a') as $letterUrl) {
 
 $totalEntriesHaveNounForms = 0;
 $totalNounEntries = 0;
-$totalEntriesVerbFormsHaveAudio = 0;
+$totalVerbFormsEntriesHaveAudio = 0;
 $totalEntriesHaveVerbForms = 0;
 $totalVerbEntries = 0;
 $totalEntriesHaveAdjectiveForms = 0;
 $totalAdjectiveEntries = 0;
 foreach ($wordsUrl as $wordUrl) {
 
-    $wordDocument = new Document($wordUrl, true);
+    if ($wordUrl != 'http://www.oxfordlearnersdictionaries.com/definition/english/nancy-drew') { //this link is NOT FOUND
 
-    if (count($elements = $wordDocument->find('.h')) != 0) { //check if word has name
+        $wordDocument = new Document($wordUrl, true);
 
-        $entryName = $wordDocument->find('.h')[0]->text();
+        if (count($elements = $wordDocument->find('.h')) != 0) { //check if word has name
 
-        if (count($elements = $wordDocument->find('.webtop-g .pos')) != 0) { //check if word has part of speech
-            $pos = $wordDocument->find('.webtop-g .pos')[0]->text(); //find part of speech of word
-            if ($pos == 'noun') {
-                $totalNounEntries++;
-                if (count($elements = $wordDocument->find('.if-gs')) != 0) { //check if word has noun forms
+            $entryName = $wordDocument->find('.h')[0]->text();
 
-                    $totalEntriesHaveNounForms++;
+            if (count($elements = $wordDocument->find('.webtop-g .pos')) != 0) { //check if word has part of speech
+                $pos = $wordDocument->find('.webtop-g .pos')[0]->text(); //find part of speech of word
+                if ($pos == 'noun') {
+                    $totalNounEntries++;
+                    if (count($elements = $wordDocument->find('.if-gs')) != 0) { //check if word has noun forms
 
-                    echo 'Current entry has noun forms: ' . $entryName . PHP_EOL;
-                    echo 'Total entries have noun forms: ' . $totalEntriesHaveNounForms . PHP_EOL;
-                    echo 'Total noun entries: ' . $totalNounEntries . PHP_EOL;
-                }
-            } elseif ($pos == 'adjective') {
-                $totalAdjectiveEntries++;
-                if (count($elements = $wordDocument->find('.if-gs')) != 0) { //check if word has adjective forms
+                        $totalEntriesHaveNounForms++;
 
-                    $totalEntriesHaveAdjectiveForms++;
-
-                    echo 'Current entry has adjective forms: ' . $entryName . PHP_EOL;
-                    echo 'Total entries have adjective forms: ' . $totalEntriesHaveAdjectiveForms . PHP_EOL;
-                    echo 'Total adjective entries: ' . $totalAdjectiveEntries . PHP_EOL;
-                }
-            } elseif ($pos == 'verb') {
-                $totalVerbEntries++;
-                if (count($elements = $wordDocument->find("//span[contains(@unbox, 'verbforms')]", Query::TYPE_XPATH)) != 0) { //check if word has verb forms
-
-                    $totalEntriesHaveVerbForms++;
-
-                    if (count($elements = $wordDocument->find("//div[contains(@verbform, 'y')]", Query::TYPE_XPATH)) != 0) {
-                        $totalEntriesVerbFormsHaveAudio++;
+                        echo 'Current entry has noun forms: ' . $entryName . PHP_EOL;
+                        echo 'Total entries have noun forms: ' . $totalEntriesHaveNounForms . PHP_EOL;
+                        echo 'Total noun entries: ' . $totalNounEntries . PHP_EOL;
                     }
+                } elseif ($pos == 'adjective') {
+                    $totalAdjectiveEntries++;
+                    if (count($elements = $wordDocument->find('.if-gs')) != 0) { //check if word has adjective forms
 
-                    echo 'Current entry has verb forms: ' . $entryName . PHP_EOL;
-                    echo 'Total entries verb forms have audio: ' . $totalEntriesVerbFormsHaveAudio . PHP_EOL;
-                    echo 'Total entries have verb forms: ' . $totalEntriesHaveVerbForms . PHP_EOL;
-                    echo 'Total verb entries: ' . $totalVerbEntries . PHP_EOL;
+                        $totalEntriesHaveAdjectiveForms++;
+
+                        echo 'Current entry has adjective forms: ' . $entryName . PHP_EOL;
+                        echo 'Total entries have adjective forms: ' . $totalEntriesHaveAdjectiveForms . PHP_EOL;
+                        echo 'Total adjective entries: ' . $totalAdjectiveEntries . PHP_EOL;
+                    }
+                } elseif ($pos == 'verb') {
+                    $totalVerbEntries++;
+                    if (count($elements = $wordDocument->find("//span[contains(@unbox, 'verbforms')]", Query::TYPE_XPATH)) != 0) { //check if word has verb forms
+
+                        $totalEntriesHaveVerbForms++;
+
+                        if (count($elements = $wordDocument->find("//div[contains(@verbform, 'y')]", Query::TYPE_XPATH)) != 0) {
+                            $totalVerbFormsEntriesHaveAudio++;
+                        }
+
+                        echo 'Current entry has verb forms: ' . $entryName . PHP_EOL;
+                        echo 'Total verb forms entries have audio: ' . $totalVerbFormsEntriesHaveAudio . PHP_EOL;
+                        echo 'Total entries have verb forms: ' . $totalEntriesHaveVerbForms . PHP_EOL;
+                        echo 'Total verb entries: ' . $totalVerbEntries . PHP_EOL;
+                    }
                 }
-            }
 
+            }
         }
     }
 }

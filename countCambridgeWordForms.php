@@ -51,7 +51,7 @@ foreach ($wordsUrl as $wordUrl) {
 
         $entryName = $wordDocument->find('#dataset-british .headword')[0]->text();
 
-        if (count($elements = $wordDocument->find('.irreg-infls')) != 0) {
+        if (count($elements = $wordDocument->find('#dataset-british .irreg-infls')) != 0) {
             $irreg++;
         }
 
@@ -59,7 +59,7 @@ foreach ($wordsUrl as $wordUrl) {
             $pos = $wordDocument->find('#dataset-british .pos')[0]->text(); //find part of speech of word
             if ($pos == 'noun') {
                 $totalNounEntries++;
-                if (count($elements = $wordDocument->find("//span[contains(@type, 'plural')]", Query::TYPE_XPATH)) != 0) { //check if word has noun forms
+                if (count($elements = $wordDocument->find('#dataset-british')[0]->find("//span[contains(@type, 'plural')]", Query::TYPE_XPATH)) != 0) { //check if word has noun forms
 
                     $totalEntriesHaveNounForms++;
 
@@ -69,7 +69,7 @@ foreach ($wordsUrl as $wordUrl) {
                 }
             } elseif ($pos == 'adjective') {
                 $totalAdjectiveEntries++;
-                if (count($elements = $wordDocument->find('.irreg-infls')) != 0) { //check if word has adjective forms
+                if (count($elements = $wordDocument->find('#dataset-british .irreg-infls')) != 0) { //check if word has adjective forms
 
                     $totalEntriesHaveAdjectiveForms++;
 
@@ -79,7 +79,7 @@ foreach ($wordsUrl as $wordUrl) {
                 }
             } elseif ($pos == 'verb') {
                 $totalVerbEntries++;
-                if (count($elements = $wordDocument->find('.irreg-infls')) != 0) { //check if word has verb forms
+                if (count($elements = $wordDocument->find('#dataset-british .irreg-infls')) != 0) { //check if word has verb forms
 
                     $totalEntriesHaveVerbForms++;
 

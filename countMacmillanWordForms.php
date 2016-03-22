@@ -44,43 +44,45 @@ $totalEntriesHaveAdjectiveForms = 0;
 $totalAdjectiveEntries = 0;
 foreach ($wordsUrl as $wordUrl) {
 
-    $wordDocument = new Document($wordUrl, true);
+    if ($wordUrl != 'http://www.macmillandictionary.com/dictionary/british/huntington-s-disease') { //this link is NOT FOUND
 
-    if (count($elements = $wordDocument->find('h1 .BASE')) != 0) { //check if word has name
+        $wordDocument = new Document($wordUrl, true);
 
-        $entryName = $wordDocument->find('h1 .BASE')[0]->text();
+        if (count($elements = $wordDocument->find('h1 .BASE')) != 0) { //check if word has name
 
-        if (count($elements = $wordDocument->find('#headbar .PART-OF-SPEECH')) != 0) { //check if word has part of speech
-            $pos = trim($wordDocument->find('#headbar .PART-OF-SPEECH')[0]->text()); //find part of speech of word
-            if ($pos == 'noun') {
-                $totalNounEntries++;
-                if (count($elements = $wordDocument->find('.wordforms')) != 0) { //check if word has noun forms
+            $entryName = $wordDocument->find('h1 .BASE')[0]->text();
 
-                    $totalEntriesHaveNounForms++;
+            if (count($elements = $wordDocument->find('#headbar .PART-OF-SPEECH')) != 0) { //check if word has part of speech
+                $pos = trim($wordDocument->find('#headbar .PART-OF-SPEECH')[0]->text()); //find part of speech of word
+                if ($pos == 'noun') {
+                    $totalNounEntries++;
+                    if (count($elements = $wordDocument->find('.wordforms')) != 0) { //check if word has noun forms
 
-                    echo 'Current entry has noun forms: ' . $entryName . PHP_EOL;
+                        $totalEntriesHaveNounForms++;
+
+                        echo 'Current entry has noun forms: ' . $entryName . PHP_EOL;
+                    }
+                } elseif ($pos == 'adjective') {
+                    $totalAdjectiveEntries++;
+                    if (count($elements = $wordDocument->find('.wordforms')) != 0) { //check if word has adjective forms
+
+                        $totalEntriesHaveAdjectiveForms++;
+
+                        echo 'Current entry has adjective forms: ' . $entryName . PHP_EOL;
+                    }
+                } elseif ($pos == 'verb') {
+                    $totalVerbEntries++;
+                    if (count($elements = $wordDocument->find('.wordforms')) != 0) { //check if word has verb forms
+
+                        $totalEntriesHaveVerbForms++;
+
+                        echo 'Current entry has verb forms: ' . $entryName . PHP_EOL;
+                    }
                 }
-            } elseif ($pos == 'adjective') {
-                $totalAdjectiveEntries++;
-                if (count($elements = $wordDocument->find('.wordforms')) != 0) { //check if word has adjective forms
 
-                    $totalEntriesHaveAdjectiveForms++;
-
-                    echo 'Current entry has adjective forms: ' . $entryName . PHP_EOL;
-                }
-            } elseif ($pos == 'verb') {
-                $totalVerbEntries++;
-                if (count($elements = $wordDocument->find('.wordforms')) != 0) { //check if word has verb forms
-
-                    $totalEntriesHaveVerbForms++;
-
-                    echo 'Current entry has verb forms: ' . $entryName . PHP_EOL;
-                }
             }
-
         }
     }
-
 }
 
 echo 'Total entries have noun forms/Total noun entries: ' . $totalEntriesHaveNounForms . '/' . $totalNounEntries . PHP_EOL;

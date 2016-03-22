@@ -42,7 +42,6 @@ $totalEntriesHaveVerbForms = 0;
 $totalVerbEntries = 0;
 $totalEntriesHaveAdjectiveForms = 0;
 $totalAdjectiveEntries = 0;
-$irreg = 0;
 foreach ($wordsUrl as $wordUrl) {
 
     $wordDocument = new Document($wordUrl, true);
@@ -50,10 +49,6 @@ foreach ($wordsUrl as $wordUrl) {
     if (count($elements = $wordDocument->find('#dataset-british .headword')) != 0) { //check if word has name
 
         $entryName = $wordDocument->find('#dataset-british .headword')[0]->text();
-
-        if (count($elements = $wordDocument->find('#dataset-british .irreg-infls')) != 0) {
-            $irreg++;
-        }
 
         if (count($elements = $wordDocument->find('#dataset-british .pos')) != 0) { //check if word has part of speech
             $pos = $wordDocument->find('#dataset-british .pos')[0]->text(); //find part of speech of word
@@ -64,8 +59,6 @@ foreach ($wordsUrl as $wordUrl) {
                     $totalEntriesHaveNounForms++;
 
                     echo 'Current entry has noun forms: ' . $entryName . PHP_EOL;
-                    echo 'Total entries have noun forms: ' . $totalEntriesHaveNounForms . PHP_EOL;
-                    echo 'Total noun entries: ' . $totalNounEntries . PHP_EOL;
                 }
             } elseif ($pos == 'adjective') {
                 $totalAdjectiveEntries++;
@@ -74,8 +67,6 @@ foreach ($wordsUrl as $wordUrl) {
                     $totalEntriesHaveAdjectiveForms++;
 
                     echo 'Current entry has adjective forms: ' . $entryName . PHP_EOL;
-                    echo 'Total entries have adjective forms: ' . $totalEntriesHaveAdjectiveForms . PHP_EOL;
-                    echo 'Total adjective entries: ' . $totalAdjectiveEntries . PHP_EOL;
                 }
             } elseif ($pos == 'verb') {
                 $totalVerbEntries++;
@@ -84,8 +75,6 @@ foreach ($wordsUrl as $wordUrl) {
                     $totalEntriesHaveVerbForms++;
 
                     echo 'Current entry has verb forms: ' . $entryName . PHP_EOL;
-                    echo 'Total entries have verb forms: ' . $totalEntriesHaveVerbForms . PHP_EOL;
-                    echo 'Total verb entries: ' . $totalVerbEntries . PHP_EOL;
                 }
             }
 
@@ -94,7 +83,13 @@ foreach ($wordsUrl as $wordUrl) {
 
 }
 
-echo '$irreg = ' . $irreg . PHP_EOL;
+echo 'Total entries have noun forms: ' . $totalEntriesHaveNounForms . PHP_EOL;
+echo 'Total noun entries: ' . $totalNounEntries . PHP_EOL;
+echo 'Total entries have adjective forms: ' . $totalEntriesHaveAdjectiveForms . PHP_EOL;
+echo 'Total adjective entries: ' . $totalAdjectiveEntries . PHP_EOL;
+echo 'Total entries have verb forms: ' . $totalEntriesHaveVerbForms . PHP_EOL;
+echo 'Total verb entries: ' . $totalVerbEntries . PHP_EOL;
+
 $endTime = microtime(true);
 $executionTime = ($endTime - $startTime) / 60;
 

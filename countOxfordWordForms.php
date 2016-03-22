@@ -62,8 +62,6 @@ foreach ($wordsUrl as $wordUrl) {
                         $totalEntriesHaveNounForms++;
 
                         echo 'Current entry has noun forms: ' . $entryName . PHP_EOL;
-                        echo 'Total entries have noun forms: ' . $totalEntriesHaveNounForms . PHP_EOL;
-                        echo 'Total noun entries: ' . $totalNounEntries . PHP_EOL;
                     }
                 } elseif ($pos == 'adjective') {
                     $totalAdjectiveEntries++;
@@ -72,8 +70,6 @@ foreach ($wordsUrl as $wordUrl) {
                         $totalEntriesHaveAdjectiveForms++;
 
                         echo 'Current entry has adjective forms: ' . $entryName . PHP_EOL;
-                        echo 'Total entries have adjective forms: ' . $totalEntriesHaveAdjectiveForms . PHP_EOL;
-                        echo 'Total adjective entries: ' . $totalAdjectiveEntries . PHP_EOL;
                     }
                 } elseif ($pos == 'verb') {
                     $totalVerbEntries++;
@@ -86,9 +82,6 @@ foreach ($wordsUrl as $wordUrl) {
                         }
 
                         echo 'Current entry has verb forms: ' . $entryName . PHP_EOL;
-                        echo 'Total verb forms entries have audio: ' . $totalVerbFormsEntriesHaveAudio . PHP_EOL;
-                        echo 'Total entries have verb forms: ' . $totalEntriesHaveVerbForms . PHP_EOL;
-                        echo 'Total verb entries: ' . $totalVerbEntries . PHP_EOL;
                     }
                 }
 
@@ -96,6 +89,14 @@ foreach ($wordsUrl as $wordUrl) {
         }
     }
 }
+
+echo 'Total entries have noun forms: ' . $totalEntriesHaveNounForms . PHP_EOL;
+echo 'Total noun entries: ' . $totalNounEntries . PHP_EOL;
+echo 'Total entries have adjective forms: ' . $totalEntriesHaveAdjectiveForms . PHP_EOL;
+echo 'Total adjective entries: ' . $totalAdjectiveEntries . PHP_EOL;
+echo 'Total verb forms entries have audio: ' . $totalVerbFormsEntriesHaveAudio . PHP_EOL;
+echo 'Total entries have verb forms: ' . $totalEntriesHaveVerbForms . PHP_EOL;
+echo 'Total verb entries: ' . $totalVerbEntries . PHP_EOL;
 
 $endTime = microtime(true);
 $executionTime = ($endTime - $startTime) / 60;

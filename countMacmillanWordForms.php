@@ -44,7 +44,7 @@ $totalEntriesHaveAdjectiveForms = 0;
 $totalAdjectiveEntries = 0;
 foreach ($wordsUrl as $wordUrl) {
 
-    if ($wordUrl != 'http://www.macmillandictionary.com/dictionary/british/huntington-s-disease') { //this link is NOT FOUND
+    if ($wordUrl != 'http://www.macmillandictionary.com/dictionary/british/huntington-s-disease' && $wordUrl != 'http://www.macmillandictionary.com/dictionary/british/za-atar') { //this link is NOT FOUND
 
         $wordDocument = new Document($wordUrl, true);
 

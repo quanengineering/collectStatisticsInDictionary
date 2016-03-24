@@ -52,6 +52,7 @@ do {
 
 $totalEntriesHaveNounForms = 0;
 $totalNounEntries = 0;
+$totalVerbFormsEntriesHaveVerbTable = 0;
 $totalEntriesHaveVerbForms = 0;
 $totalVerbEntries = 0;
 $totalEntriesHaveAdjectiveForms = 0;
@@ -102,6 +103,11 @@ foreach ($wordsUrl as $alphaKey) {
                 }
             } elseif ($pos == 'verb') {
                 $totalVerbEntries++;
+
+                if (count($elements = $wordDocument->find("//span[contains(@data-type, 'verbs')]", Query::TYPE_XPATH)) != 0) {
+                    $totalVerbFormsEntriesHaveVerbTable++;
+                }
+
                 if (count($elements = $wordDocument->find('.entryhead')[0]->find('.inflections')) != 0) { //check if word has verb forms
 
                     $totalEntriesHaveVerbForms++;
@@ -118,6 +124,7 @@ foreach ($wordsUrl as $alphaKey) {
 echo 'Total entries have noun forms/Total noun entries: ' . $totalEntriesHaveNounForms . '/' . $totalNounEntries . PHP_EOL;
 echo 'Total entries have  adjective forms/Total adjective entries: ' . $totalEntriesHaveAdjectiveForms . '/' . $totalAdjectiveEntries . PHP_EOL;
 echo 'Total entries have verb forms/Total verb entries: ' . $totalEntriesHaveVerbForms . '/' . $totalVerbEntries . PHP_EOL;
+echo 'Total verb forms entries have Verb Table: ' . $totalVerbFormsEntriesHaveVerbTable . PHP_EOL;
 echo 'Statistics from Longman Dictionary of Contemporary English' . PHP_EOL;
 
 $endTime = microtime(true);

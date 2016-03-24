@@ -35,7 +35,8 @@ do {
     $document = new Document($response);
     foreach ($document->find('a') as $element) {
         $alphaKey = $element->getAttribute('data-alphakey');
-        $wordsUrl[] = $alphaKey;
+        $key = $element->getAttribute('data-key');
+        $wordsUrl[$alphaKey] = $key;
     }
 
     if ($alphaKey == 'insipidness,_insipidity_d1') { //this link is NOT FOUND
@@ -50,6 +51,7 @@ do {
 
 } while ($alphaKey != 'zzz');
 
+$entriesId = array();
 $totalEntriesHaveNounForms = 0;
 $totalNounEntries = 0;
 $totalVerbFormsEntriesHaveVerbTable = 0;
@@ -57,68 +59,71 @@ $totalEntriesHaveVerbForms = 0;
 $totalVerbEntries = 0;
 $totalEntriesHaveAdjectiveForms = 0;
 $totalAdjectiveEntries = 0;
-foreach ($wordsUrl as $alphaKey) {
+foreach ($wordsUrl as $alphaKey => $key) {
 
-    # new data
-    $data = array(
-        'alpha_key' => $alphaKey,
-        'name' => ''
-    );
-    # Create a connection
-    $url = 'http://global.longmandictionaries.com/dict_search/entry_for_alpha_key/ldoce6/';
-    $ch = curl_init($url);
-    # Form data string
-    $postString = http_build_query($data, '', '&');
-    # Setting options
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $postString);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    # Get the response
-    $wordDocument = curl_exec($ch);
-    curl_close($ch);
+    if (!in_array($key, $entriesId)) { //check if entry existed = check if entry is crawled before
+        $entriesId[] = $key;
 
-    $wordDocument = new Document($wordDocument);
+        # new data
+        $data = array(
+            'alpha_key' => $alphaKey,
+            'name' => ''
+        );
+        # Create a connection
+        $url = 'http://global.longmandictionaries.com/dict_search/entry_for_alpha_key/ldoce6/';
+        $ch = curl_init($url);
+        # Form data string
+        $postString = http_build_query($data, '', '&');
+        # Setting options
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postString);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        # Get the response
+        $wordDocument = curl_exec($ch);
+        curl_close($ch);
 
-    if (count($elements = $wordDocument->find('.hwd')) != 0) { //check if word has name
+        $wordDocument = new Document($wordDocument);
 
-        $entryName = $wordDocument->find('.hwd')[0]->text();
+        if (count($elements = $wordDocument->find('.hwd')) != 0) { //check if word has name
 
-        if (count($elements = $wordDocument->find('.entryhead')[0]->find('.pos')) != 0) { //check if word has part of speech
-            $pos = trim($wordDocument->find('.entryhead')[0]->find('.pos')[0]->text()); //find part of speech of word
-            if ($pos == 'noun') {
-                $totalNounEntries++;
-                if (count($elements = $wordDocument->find('.entryhead')[0]->find('.inflections')) != 0) { //check if word has noun forms
+            $entryName = $wordDocument->find('.hwd')[0]->text();
 
-                    $totalEntriesHaveNounForms++;
+            if (count($elements = $wordDocument->find('.entryhead')[0]->find('.pos')) != 0) { //check if word has part of speech
+                $pos = trim($wordDocument->find('.entryhead')[0]->find('.pos')[0]->text()); //find part of speech of word
+                if ($pos == 'noun') {
+                    $totalNounEntries++;
+                    if (count($elements = $wordDocument->find('.entryhead')[0]->find('.inflections')) != 0) { //check if word has noun forms
 
-                    echo 'Current entry has noun forms: ' . $entryName . PHP_EOL;
+                        $totalEntriesHaveNounForms++;
+
+                        echo 'Current entry has noun forms: ' . $entryName . PHP_EOL;
+                    }
+                } elseif ($pos == 'adjective') {
+                    $totalAdjectiveEntries++;
+                    if (count($elements = $wordDocument->find('.entryhead')[0]->find('.inflections')) != 0) { //check if word has adjective forms
+
+                        $totalEntriesHaveAdjectiveForms++;
+
+                        echo 'Current entry has adjective forms: ' . $entryName . PHP_EOL;
+                    }
+                } elseif ($pos == 'verb') {
+                    $totalVerbEntries++;
+
+                    if (count($elements = $wordDocument->find("//span[contains(@data-type, 'verbs')]", Query::TYPE_XPATH)) != 0) {
+                        $totalVerbFormsEntriesHaveVerbTable++;
+                    }
+
+                    if (count($elements = $wordDocument->find('.entryhead')[0]->find('.inflections')) != 0) { //check if word has verb forms
+
+                        $totalEntriesHaveVerbForms++;
+
+                        echo 'Current entry has verb forms: ' . $entryName . PHP_EOL;
+                    }
                 }
-            } elseif ($pos == 'adjective') {
-                $totalAdjectiveEntries++;
-                if (count($elements = $wordDocument->find('.entryhead')[0]->find('.inflections')) != 0) { //check if word has adjective forms
 
-                    $totalEntriesHaveAdjectiveForms++;
-
-                    echo 'Current entry has adjective forms: ' . $entryName . PHP_EOL;
-                }
-            } elseif ($pos == 'verb') {
-                $totalVerbEntries++;
-
-                if (count($elements = $wordDocument->find("//span[contains(@data-type, 'verbs')]", Query::TYPE_XPATH)) != 0) {
-                    $totalVerbFormsEntriesHaveVerbTable++;
-                }
-
-                if (count($elements = $wordDocument->find('.entryhead')[0]->find('.inflections')) != 0) { //check if word has verb forms
-
-                    $totalEntriesHaveVerbForms++;
-
-                    echo 'Current entry has verb forms: ' . $entryName . PHP_EOL;
-                }
             }
-
         }
     }
-
 }
 
 echo 'Total entries have noun forms/Total noun entries: ' . $totalEntriesHaveNounForms . '/' . $totalNounEntries . PHP_EOL;

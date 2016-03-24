@@ -34,7 +34,8 @@ do {
 
     $document = new Document($response);
     foreach ($document->find('a') as $element) {
-        $wordsUrl[] = $element->getAttribute('data-alphakey');
+        $alphaKey = $element->getAttribute('data-alphakey');
+        $wordsUrl[] = $alphaKey;
     }
 
     if ($alphaKey == 'insipidness,_insipidity_d1') { //this link is NOT FOUND

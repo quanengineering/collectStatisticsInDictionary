@@ -37,6 +37,7 @@ foreach ($letters->find('#letters a') as $letterUrl) {
 }
 
 $totalEntriesHaveSynonyms = 0;
+$totalEntries = 0;
 foreach ($wordsUrl as $wordUrl) {
 
     if ($wordUrl != 'http://www.oxfordlearnersdictionaries.com/definition/english/nancy-drew') { //this link is NOT FOUND
@@ -47,16 +48,18 @@ foreach ($wordsUrl as $wordUrl) {
 
             $entryName = $wordDocument->find('.h')[0]->text();
 
+            $totalEntries++;
+
             if (count($elements = $wordDocument->find("//span[contains(@unbox, 'synonyms')]", Query::TYPE_XPATH)) != 0) { //check if word has synonym
                 $totalEntriesHaveSynonyms++;
 
-                echo 'Current entry has synonyms: ' . $entryName . PHP_EOL;
+                echo 'Current entry has thesauruses: ' . $entryName . PHP_EOL;
             }
         }
     }
 }
 
-echo 'Total entries have synonyms: ' . $totalEntriesHaveSynonyms . PHP_EOL;
+echo 'Total entries have thesauruses/Total entries: ' . $totalEntriesHaveSynonyms . '/' . $totalEntries . PHP_EOL;
 echo 'Statistics from Oxford Advanced Learner’s Dictionary' . PHP_EOL;
 
 $endTime = microtime(true);

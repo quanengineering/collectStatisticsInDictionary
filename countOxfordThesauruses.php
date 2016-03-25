@@ -49,6 +49,8 @@ foreach ($wordsUrl as $wordUrl) {
 
             if (count($elements = $wordDocument->find("//span[contains(@unbox, 'synonyms')]", Query::TYPE_XPATH)) != 0) { //check if word has synonym
                 $totalEntriesHaveSynonyms++;
+
+                echo 'Current entry has synonyms: ' . $entryName . PHP_EOL;
             }
         }
     }

@@ -20,17 +20,17 @@ set_error_handler("customError");
 $subCategoryUrl = 'http://www.oxfordlearnersdictionaries.com/topic/animal_homes';
 $document = new Document($subCategoryUrl, true);
 
-$numberOfSubjects = 0;
+$totalSubjects = 0;
 foreach ($document->find('#rightcolumn div div ul li') as $subject) {
-    $numberOfSubjects++;
+    $totalSubjects++;
 }
 
 $homePageUrl = 'http://www.oxfordlearnersdictionaries.com/topic/';
 $document = new Document($homePageUrl, true);
 
-$numberOfCategories = 0;
+$totalCategories = 0;
 foreach ($document->find('#topic-list dd dl dt') as $category) {
-    $numberOfCategories++;
+    $totalCategories++;
 }
 
 $subCategoriesUrl = array();
@@ -47,8 +47,8 @@ foreach ($subCategoriesUrl as $subCategoryUrl) {
     }
 }
 
-echo 'Total thesauruses subjects: ' . $numberOfSubjects . PHP_EOL;
-echo 'Total thesauruses categories: ' . $numberOfCategories . PHP_EOL;
+echo 'Total thesauruses subjects: ' . $totalSubjects . PHP_EOL;
+echo 'Total thesauruses categories: ' . $totalCategories . PHP_EOL;
 echo 'Total thesauruses subcategories/Total words in thesauruses subcategories: ' . count($subCategoriesUrl) . '/' . count($entriesUrl) . PHP_EOL;
 echo 'Statistics from Oxford Advanced Learner’s Dictionary' . PHP_EOL;
 

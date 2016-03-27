@@ -52,7 +52,7 @@ foreach ($wordsUrl as $wordUrl) {
 
             if (count($elements = $wordDocument->find('.ONEBOX-HEAD')) != 0) { //check if word has additional boxes
                 foreach ($wordDocument->find('.ONEBOX-HEAD') as $element) {
-                    if(substr($element, 0, strrpos($element, ':')) == 'Collocates'){
+                    if(substr($element, 0, strrpos($element, ':')) == 'Collocates'){ //check if word has collocation
 
                         $totalEntriesHaveCollocations++;
                         echo 'Current entry has collocations: ' . $entryName . PHP_EOL;

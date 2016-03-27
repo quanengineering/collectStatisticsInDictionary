@@ -50,7 +50,7 @@ foreach ($wordsUrl as $wordUrl) {
 
             $totalEntries++;
 
-            if (count($elements = $wordDocument->find("//span[contains(@unbox, 'colloc')]", Query::TYPE_XPATH)) != 0) { //check if word has synonym
+            if (count($elements = $wordDocument->find("//span[contains(@unbox, 'colloc')]", Query::TYPE_XPATH)) != 0) { //check if word has collocation
                 $totalEntriesHaveCollocations++;
 
                 echo 'Current entry has collocations: ' . $entryName . PHP_EOL;

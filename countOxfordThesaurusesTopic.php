@@ -6,6 +6,17 @@ require "vendor/autoload.php";
 
 use DiDom\Document;
 
+//error handler function
+function customError($errno, $errstr)
+{
+    echo PHP_EOL . "<b>Error:</b> [$errno] $errstr<br>";
+    echo PHP_EOL . "Ending Script" . PHP_EOL;
+    die();
+}
+
+//set error handler
+set_error_handler("customError");
+
 $subCategoryUrl = 'http://www.oxfordlearnersdictionaries.com/topic/animal_homes';
 $document = new Document($subCategoryUrl, true);
 

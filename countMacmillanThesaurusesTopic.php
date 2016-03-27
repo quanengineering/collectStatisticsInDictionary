@@ -50,7 +50,7 @@ foreach ($wordsUrl as $wordUrl) {
 
             if (count($elements = $wordDocument->find('.moreButton')) != 0) { //check if word has synonym
                 foreach ($wordDocument->find('.moreButton') as $subCategoryUrl) {
-                    if (!in_array($subCategoryUrl->getAttribute('href'), $subCategoriesUrl)) { //check if thesaurus is not existed
+                    if ((!in_array($subCategoryUrl->getAttribute('href'), $subCategoriesUrl)) && ($subCategoryUrl->getAttribute('href') != 'http://www.macmillandictionary.com/thesaurus-category/british/')) { //check if thesaurus is not existed
                         $subCategoriesUrl[] = $subCategoryUrl->getAttribute('href');
                     }
                 }

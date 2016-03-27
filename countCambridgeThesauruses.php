@@ -36,12 +36,8 @@ foreach ($letters->find('.cdo-browse-letters a') as $letterUrl) {
     }
 }
 
-$totalEntriesHaveNounForms = 0;
-$totalNounEntries = 0;
-$totalEntriesHaveVerbForms = 0;
-$totalVerbEntries = 0;
-$totalEntriesHaveAdjectiveForms = 0;
-$totalAdjectiveEntries = 0;
+$totalEntriesHaveSynonyms = 0;
+$totalEntries = 0;
 foreach ($wordsUrl as $wordUrl) {
 
     $wordDocument = new Document($wordUrl, true);
@@ -50,42 +46,18 @@ foreach ($wordsUrl as $wordUrl) {
 
         $entryName = $wordDocument->find('#dataset-british .headword')[0]->text();
 
-        if (count($elements = $wordDocument->find('#dataset-british .pos')) != 0) { //check if word has part of speech
-            $pos = $wordDocument->find('#dataset-british .pos')[0]->text(); //find part of speech of word
-            if ($pos == 'noun') {
-                $totalNounEntries++;
-                if (count($elements = $wordDocument->find('#dataset-british')[0]->find("//span[contains(@type, 'plural')]", Query::TYPE_XPATH)) != 0) { //check if word has noun forms
+        $totalEntries++;
 
-                    $totalEntriesHaveNounForms++;
+        if (count($elements = $wordDocument->find('#dataset-british .cdo-topic')) != 0) { //check if word has synonym
+            $totalEntriesHaveSynonyms++;
 
-                    echo 'Current entry has noun forms: ' . $entryName . PHP_EOL;
-                }
-            } elseif ($pos == 'adjective') {
-                $totalAdjectiveEntries++;
-                if (count($elements = $wordDocument->find('#dataset-british .irreg-infls')) != 0) { //check if word has adjective forms
-
-                    $totalEntriesHaveAdjectiveForms++;
-
-                    echo 'Current entry has adjective forms: ' . $entryName . PHP_EOL;
-                }
-            } elseif ($pos == 'verb') {
-                $totalVerbEntries++;
-                if (count($elements = $wordDocument->find('#dataset-british .irreg-infls')) != 0) { //check if word has verb forms
-
-                    $totalEntriesHaveVerbForms++;
-
-                    echo 'Current entry has verb forms: ' . $entryName . PHP_EOL;
-                }
-            }
-
+            echo 'Current entry has thesauruses: ' . $entryName . PHP_EOL;
         }
     }
 
 }
 
-echo 'Total entries have noun forms/Total noun entries: ' . $totalEntriesHaveNounForms . '/' . $totalNounEntries . PHP_EOL;
-echo 'Total entries have  adjective forms/Total adjective entries: ' . $totalEntriesHaveAdjectiveForms . '/' . $totalAdjectiveEntries . PHP_EOL;
-echo 'Total entries have verb forms/Total verb entries: ' . $totalEntriesHaveVerbForms . '/' . $totalVerbEntries . PHP_EOL;
+echo 'Total entries have thesauruses/Total entries: ' . $totalEntriesHaveSynonyms . '/' . $totalEntries . PHP_EOL;
 echo 'Statistics from Cambridge Advanced Learner’s Dictionary & Thesaurus' . PHP_EOL;
 
 $endTime = microtime(true);

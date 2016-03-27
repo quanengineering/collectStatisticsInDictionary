@@ -47,7 +47,7 @@ foreach ($wordsUrl as $wordUrl) {
         $entryName = $wordDocument->find('#dataset-british .headword')[0]->text();
 
         if (count($elements = $wordDocument->find('#dataset-british .cdo-topic')) != 0) { //check if word has synonym
-            foreach ($wordDocument->find('#dataset-british .cdo-topic a') as $subCategoryUrl) {
+            foreach ($wordDocument->find('#dataset-british .cdo-topic') as $subCategoryUrl) {
                 if (!in_array($subCategoryUrl->getAttribute('href'), $subCategoriesUrl)) { //check if thesaurus is not existed
                     $subCategoriesUrl[] = $subCategoryUrl->getAttribute('href');
                 }

@@ -52,7 +52,9 @@ foreach ($wordsUrl as $wordUrl) {
                 if (count($elements = $element->find("//span[contains(@unbox, 'colloc')]", Query::TYPE_XPATH)) != 0) { //check if definition has collocation
                     $totalDefinitionsHaveCollocations++;
 
-                    echo 'Current definition has collocations: ' . $element->find('.def')[0]->text() . PHP_EOL;
+                    if(count($elements = $element->find('.def')) != 0){
+                        echo 'Current definition has collocations: ' . $element->find('.def')[0]->text() . PHP_EOL;
+                    }
                 }
             }
         }

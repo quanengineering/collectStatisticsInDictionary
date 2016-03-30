@@ -44,9 +44,7 @@ foreach ($wordsUrl as $wordUrl) {
 
         $wordDocument = new Document($wordUrl, true);
 
-        if (count($elements = $wordDocument->find('.h')) != 0) { //check if word has name
-
-            $definition = $wordDocument->find('.h')[0]->text();
+        if (count($elements = $wordDocument->find('.sn-g')) != 0) { //check if word has definitions
 
             foreach ($wordDocument->find('.sn-g') as $element){
                 $totalDefinitions++;
@@ -54,7 +52,7 @@ foreach ($wordsUrl as $wordUrl) {
                 if (count($elements = $element->find("//span[contains(@unbox, 'colloc')]", Query::TYPE_XPATH)) != 0) { //check if definition has collocation
                     $totalDefinitionsHaveCollocations++;
 
-                    echo 'Current definition has collocations: ' . $definition . PHP_EOL;
+                    echo 'Current definition has collocations: ' . $element->find('.def')[0]->text() . PHP_EOL;
                 }
             }
         }

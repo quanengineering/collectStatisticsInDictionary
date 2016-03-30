@@ -36,7 +36,7 @@ foreach ($letters->find('#letters a') as $letterUrl) {
     }
 }
 
-$totalEntries = 0;
+$totalWords = 0;
 $totalDefinitions = 0;
 foreach ($wordsUrl as $wordUrl) {
 
@@ -48,7 +48,8 @@ foreach ($wordsUrl as $wordUrl) {
 
             $entryName = $wordDocument->find('h1 .BASE')[0]->text();
 
-            $totalEntries++;
+            $totalWords += count($wordDocument->find('h1 .BASE'));
+            $totalWords += count($wordDocument->find('#RUNON'));
 
             if (count($elements = $wordDocument->find('.DEFINITION')) != 0) { //check if word has definitions
                 $totalDefinitions += count($wordDocument->find('.DEFINITION'));
@@ -59,7 +60,7 @@ foreach ($wordsUrl as $wordUrl) {
     }
 }
 
-echo 'Total entries/Total definitions: ' . $totalEntries . '/' . $totalDefinitions . PHP_EOL;
+echo 'Total words/Total definitions: ' . $totalWords . '/' . $totalDefinitions . PHP_EOL;
 echo 'Statistics from Macmillan English Dictionary' . PHP_EOL;
 
 $endTime = microtime(true);

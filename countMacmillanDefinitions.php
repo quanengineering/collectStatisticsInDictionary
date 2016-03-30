@@ -49,7 +49,7 @@ foreach ($wordsUrl as $wordUrl) {
             $entryName = $wordDocument->find('h1 .BASE')[0]->text();
 
             $totalWords += count($wordDocument->find('h1 .BASE'));
-            $totalWords += count($wordDocument->find('#RUNON'));
+            $totalWords += count($wordDocument->find('#RUNON .BASE'));
 
             if (count($elements = $wordDocument->find('.DEFINITION')) != 0) { //check if word has definitions
                 $totalDefinitions += count($wordDocument->find('.DEFINITION'));

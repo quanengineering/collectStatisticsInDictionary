@@ -52,7 +52,7 @@ do {
 } while ($alphaKey != 'zzz');
 
 $entriesId = array();
-$totalEntries = 0;
+$totalWords = 0;
 $totalDefinitions = 0;
 foreach ($wordsUrl as $alphaKey => $key) {
 
@@ -83,7 +83,8 @@ foreach ($wordsUrl as $alphaKey => $key) {
 
             $entryName = $wordDocument->find('.hwd')[0]->text();
 
-            $totalEntries++;
+            $totalWords += count($wordDocument->find('.hwd'));
+            $totalWords += count($wordDocument->find('.runon'));
 
             if (count($elements = $wordDocument->find('.sense .def')) != 0) { //check if word has definitions
                 $totalDefinitions += count($wordDocument->find('.sense .def'));
@@ -94,7 +95,7 @@ foreach ($wordsUrl as $alphaKey => $key) {
     }
 }
 
-echo 'Total entries/Total definitions: ' . $totalEntries . '/' . $totalDefinitions . PHP_EOL;
+echo 'Total words/Total definitions: ' . $totalWords . '/' . $totalDefinitions . PHP_EOL;
 echo 'Statistics from Longman Dictionary of Contemporary English' . PHP_EOL;
 
 $endTime = microtime(true);

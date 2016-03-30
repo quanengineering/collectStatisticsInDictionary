@@ -44,23 +44,21 @@ foreach ($wordsUrl as $wordUrl) {
 
         $wordDocument = new Document($wordUrl, true);
 
-        if (count($elements = $wordDocument->find('.DEFINITION')) != 0) { //check if word has definitions
+        foreach ($wordDocument->find('.SENSE') as $element) {
+            $totalDefinitions++;
 
-            foreach ($wordDocument->find('.SENSE') as $element) {
-                $totalDefinitions++;
+            if (count($elements = $element->find('.ONEBOX-HEAD')) != 0) { //check if word has additional boxes
+                $item = $element->find('.ONEBOX-HEAD')[0]->text();
+                if (substr($item, 0, strrpos($item, ':')) == 'Collocates') { //check if definition has collocation
+                    $totalDefinitionsHaveCollocations++;
 
-                if (count($elements = $element->find('.ONEBOX-HEAD')) != 0) { //check if word has additional boxes
-                    $item = $element->find('.ONEBOX-HEAD')[0]->text();
-                    if (substr($item, 0, strrpos($item, ':')) == 'Collocates') { //check if definition has collocation
-                        $totalDefinitionsHaveCollocations++;
-
-                        if (count($elements = $element->find('.DEFINITION')) != 0) {
-                            echo 'Current definition has collocations: ' . $element->find('.DEFINITION')[0]->text() . PHP_EOL;
-                        }
+                    if (count($elements = $element->find('.DEFINITION')) != 0) {
+                        echo 'Current definition has collocations: ' . $element->find('.DEFINITION')[0]->text() . PHP_EOL;
                     }
                 }
             }
         }
+
     }
 }
 

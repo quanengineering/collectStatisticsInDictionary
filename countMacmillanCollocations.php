@@ -45,7 +45,7 @@ foreach ($wordsUrl as $wordUrl) {
         $wordDocument = new Document($wordUrl, true);
 
         foreach ($wordDocument->find('.SENSE') as $element) {
-            $totalDefinitions++;
+            $totalDefinitions += count($element->find('.DEFINITION'));
 
             if (count($elements = $element->find('.ONEBOX-HEAD')) != 0) { //check if word has additional boxes
                 $item = $element->find('.ONEBOX-HEAD')[0]->text();

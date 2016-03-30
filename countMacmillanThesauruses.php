@@ -36,30 +36,27 @@ foreach ($letters->find('#letters a') as $letterUrl) {
     }
 }
 
-$totalEntriesHaveSynonyms = 0;
-$totalEntries = 0;
+$totalDefinitionsHaveSynonyms = 0;
+$totalDefinitions = 0;
 foreach ($wordsUrl as $wordUrl) {
 
     if ($wordUrl != 'http://www.macmillandictionary.com/dictionary/british/huntington-s-disease' && $wordUrl != 'http://www.macmillandictionary.com/dictionary/british/za-atar') { //this link is NOT FOUND
 
         $wordDocument = new Document($wordUrl, true);
 
-        if (count($elements = $wordDocument->find('h1 .BASE')) != 0) { //check if word has name
+        foreach ($wordDocument->find('.SENSE') as $element) {
+            $totalDefinitions += count($element->find('.DEFINITION'));
 
-            $entryName = $wordDocument->find('h1 .BASE')[0]->text();
+            $totalDefinitionsHaveSynonyms += count($element->find('.THES'));
 
-            $totalEntries++;
-
-            if (count($elements = $wordDocument->find('.moreButton')) != 0) { //check if word has synonym
-                $totalEntriesHaveSynonyms++;
-
-                echo 'Current entry has thesauruses: ' . $entryName . PHP_EOL;
+            if (count($elements = $element->find('.DEFINITION')) != 0) {
+                echo 'Current definition has collocations: ' . $element->find('.DEFINITION')[0]->text() . PHP_EOL;
             }
         }
     }
 }
 
-echo 'Total entries have thesauruses/Total entries: ' . $totalEntriesHaveSynonyms . '/' . $totalEntries . PHP_EOL;
+echo 'Total definitions have thesauruses/Total definitions: ' . $totalDefinitionsHaveSynonyms . '/' . $totalDefinitions . PHP_EOL;
 echo 'Statistics from Macmillan English Dictionary' . PHP_EOL;
 
 $endTime = microtime(true);

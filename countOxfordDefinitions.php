@@ -46,14 +46,14 @@ foreach ($wordsUrl as $wordUrl) {
 
         if (count($elements = $wordDocument->find('.h')) != 0) { //check if word has name
 
-            $word = $wordDocument->find('.h')[0]->text();
+            $entryName = $wordDocument->find('.h')[0]->text();
 
             $totalWords += count($wordDocument->find('.h'));
 
             if (count($elements = $wordDocument->find('.sn-g')) != 0) { //check if word has definitions
                 $totalDefinitions += count($wordDocument->find('.sn-g'));
 
-                echo 'Current word has definitions: ' . $word . PHP_EOL;
+                echo 'Current entry has definitions: ' . $entryName . PHP_EOL;
             }
         }
     }

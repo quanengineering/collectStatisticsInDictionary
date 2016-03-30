@@ -36,7 +36,7 @@ foreach ($letters->find('.cdo-browse-letters a') as $letterUrl) {
     }
 }
 
-$totalEntries = 0;
+$totalWords = 0;
 $totalDefinitions = 0;
 foreach ($wordsUrl as $wordUrl) {
 
@@ -46,10 +46,11 @@ foreach ($wordsUrl as $wordUrl) {
 
         $entryName = $wordDocument->find('#dataset-british .headword')[0]->text();
 
-        $totalEntries++;
+        $totalWords += count($wordDocument->find('#dataset-british .headword'));
+        $totalWords += count($wordDocument->find('#dataset-british .runon'));
 
-        if (count($elements = $wordDocument->find('#dataset-british .def')) != 0) { //check if word has definitions
-            $totalDefinitions += count($wordDocument->find('#dataset-british .def'));
+        if (count($elements = $wordDocument->find('#dataset-british .def-head')) != 0) { //check if word has definitions
+            $totalDefinitions += count($wordDocument->find('#dataset-british .def-head'));
 
             echo 'Current entry has definitions: ' . $entryName . PHP_EOL;
         }
@@ -57,7 +58,7 @@ foreach ($wordsUrl as $wordUrl) {
 
 }
 
-echo 'Total entries/Total definitions: ' . $totalEntries . '/' . $totalDefinitions . PHP_EOL;
+echo 'Total words/Total definitions: ' . $totalWords . '/' . $totalDefinitions . PHP_EOL;
 echo 'Statistics from Cambridge Advanced Learner’s Dictionary & Thesaurus' . PHP_EOL;
 
 $endTime = microtime(true);

@@ -50,7 +50,7 @@ foreach ($wordsUrl as $wordUrl) {
             $totalDefinitionsHaveSynonyms += count($element->find('.THES'));
 
             if (count($elements = $element->find('.DEFINITION')) != 0) {
-                echo 'Current definition has collocations: ' . $element->find('.DEFINITION')[0]->text() . PHP_EOL;
+                echo 'Current definition has thesauruses: ' . $element->find('.DEFINITION')[0]->text() . PHP_EOL;
             }
         }
     }

@@ -53,7 +53,7 @@ do {
 
 $entriesId = array();
 $totalEntriesHaveCollocations = 0;
-$totalEntries = 0;
+$totalDefinitions = 0;
 foreach ($wordsUrl as $alphaKey => $key) {
 
     if (!in_array($key, $entriesId)) { //check if entry existed = check if entry is crawled before
@@ -83,18 +83,20 @@ foreach ($wordsUrl as $alphaKey => $key) {
 
             $entryName = $wordDocument->find('.hwd')[0]->text();
 
-            $totalEntries++;
-
             if (count($elements = $wordDocument->find("//span[contains(@data-type, 'collocations')]", Query::TYPE_XPATH)) != 0) { //check if word has collocation
                 $totalEntriesHaveCollocations++;
-
                 echo 'Current entry has collocations: ' . $entryName . PHP_EOL;
+            }
+
+            if (count($elements = $wordDocument->find('.sense .def')) != 0) { //check if word has definitions
+                $totalDefinitions += count($wordDocument->find('.sense .def'));
+
             }
         }
     }
 }
 
-echo 'Total entries have collocations/Total entries: ' . $totalEntriesHaveCollocations . '/' . $totalEntries . PHP_EOL;
+echo 'Total entries have collocations/Total definitions: ' . $totalEntriesHaveCollocations . '/' . $totalDefinitions . PHP_EOL;
 echo 'Statistics from Longman Dictionary of Contemporary English' . PHP_EOL;
 
 $endTime = microtime(true);

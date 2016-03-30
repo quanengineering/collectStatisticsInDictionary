@@ -36,29 +36,27 @@ foreach ($letters->find('#letters a') as $letterUrl) {
     }
 }
 
-$totalEntriesHaveCollocations = 0;
-$totalEntries = 0;
+$totalDefinitionsHaveCollocations = 0;
+$totalDefinitions = 0;
 foreach ($wordsUrl as $wordUrl) {
 
     if ($wordUrl != 'http://www.macmillandictionary.com/dictionary/british/huntington-s-disease' && $wordUrl != 'http://www.macmillandictionary.com/dictionary/british/za-atar') { //this link is NOT FOUND
 
         $wordDocument = new Document($wordUrl, true);
 
-        if (count($elements = $wordDocument->find('h1 .BASE')) != 0) { //check if word has name
+        if (count($elements = $wordDocument->find('.DEFINITION')) != 0) { //check if word has definitions
 
-            $entryName = $wordDocument->find('h1 .BASE')[0]->text();
+            foreach ($wordDocument->find('.SENSE') as $element) {
+                $totalDefinitions++;
 
-            $totalEntries++;
+                if (count($elements = $element->find('.ONEBOX-HEAD')) != 0) { //check if word has additional boxes
+                    $item = $element->find('.ONEBOX-HEAD')->text();
+                    if (substr($item, 0, strrpos($item, ':')) == 'Collocates') { //check if definition has collocation
+                        $totalDefinitionsHaveCollocations++;
 
-            if (count($elements = $wordDocument->find('.ONEBOX-HEAD')) != 0) { //check if word has additional boxes
-                foreach ($wordDocument->find('.ONEBOX-HEAD') as $element) {
-                    $element = $element->text();
-                    if(substr($element, 0, strrpos($element, ':')) == 'Collocates'){ //check if word has collocation
-
-                        $totalEntriesHaveCollocations++;
-                        echo 'Current entry has collocations: ' . $entryName . PHP_EOL;
-
-                        break;
+                        if (count($elements = $element->find('.DEFINITION')) != 0) {
+                            echo 'Current definition has collocations: ' . $element->find('.DEFINITION')[0]->text() . PHP_EOL;
+                        }
                     }
                 }
             }
@@ -66,7 +64,7 @@ foreach ($wordsUrl as $wordUrl) {
     }
 }
 
-echo 'Total entries have collocations/Total entries: ' . $totalEntriesHaveCollocations . '/' . $totalEntries . PHP_EOL;
+echo 'Total definitions have collocations/Total definitions: ' . $totalDefinitionsHaveCollocations . '/' . $totalDefinitions . PHP_EOL;
 echo 'Statistics from Macmillan English Dictionary' . PHP_EOL;
 
 $endTime = microtime(true);

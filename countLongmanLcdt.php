@@ -44,9 +44,9 @@ do {
 } while ($alphaKey != 'zone');
 
 $entriesId = array();
-$totalEntriesHaveCollocations = 0;
-$totalEntriesHaveSynonyms = 0;
-$totalEntries = 0;
+$totalWordsHaveCollocations = 0;
+$totalWordsHaveSynonyms = 0;
+$totalWords = 0;
 foreach ($wordsUrl as $alphaKey => $key) {
 
     if (!in_array($key, $entriesId)) { //check if entry existed = check if entry is crawled before
@@ -74,27 +74,27 @@ foreach ($wordsUrl as $alphaKey => $key) {
 
         if (count($elements = $wordDocument->find('.hwd')) != 0) { //check if word has name
 
-            $entryName = $wordDocument->find('.hwd')[0]->text();
+            $wordName = $wordDocument->find('.hwd')[0]->text();
 
-            $totalEntries++;
+            $totalWords++;
 
             if (count($elements = $wordDocument->find('.collobox')) != 0) { //check if word has collocation
-                $totalEntriesHaveCollocations++;
+                $totalWordsHaveCollocations++;
 
-                echo 'Current entry has collocations: ' . $entryName . PHP_EOL;
+                echo 'Current word has collocations: ' . $wordName . PHP_EOL;
             }
 
             if (count($elements = $wordDocument->find('.thesbox')) != 0) { //check if word has synonym
-                $totalEntriesHaveSynonyms++;
+                $totalWordsHaveSynonyms++;
 
-                echo 'Current entry has thesauruses: ' . $entryName . PHP_EOL;
+                echo 'Current word has thesauruses: ' . $wordName . PHP_EOL;
             }
         }
     }
 }
 
-echo 'Total entries have collocations/Total entries: ' . $totalEntriesHaveCollocations . '/' . $totalEntries . PHP_EOL;
-echo 'Total entries have thesauruses/Total entries: ' . $totalEntriesHaveSynonyms . '/' . $totalEntries . PHP_EOL;
+echo 'Total words have collocations/Total words: ' . $totalWordsHaveCollocations . '/' . $totalWords . PHP_EOL;
+echo 'Total words have thesauruses/Total words: ' . $totalWordsHaveSynonyms . '/' . $totalWords . PHP_EOL;
 echo 'Statistics from Longman Collocations Dictionary and Thesaurus' . PHP_EOL;
 
 $endTime = microtime(true);

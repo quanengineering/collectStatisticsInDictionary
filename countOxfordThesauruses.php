@@ -36,30 +36,32 @@ foreach ($letters->find('#letters a') as $letterUrl) {
     }
 }
 
-$totalEntriesHaveSynonyms = 0;
-$totalEntries = 0;
+$totalDefinitionsHaveSynonyms = 0;
+$totalDefinitions = 0;
 foreach ($wordsUrl as $wordUrl) {
 
     if ($wordUrl != 'http://www.oxfordlearnersdictionaries.com/definition/english/nancy-drew') { //this link is NOT FOUND
 
         $wordDocument = new Document($wordUrl, true);
 
-        if (count($elements = $wordDocument->find('.h')) != 0) { //check if word has name
+        if (count($elements = $wordDocument->find('.sn-g')) != 0) { //check if word has definitions
 
-            $entryName = $wordDocument->find('.h')[0]->text();
+            foreach ($wordDocument->find('.sn-g') as $element) {
+                $totalDefinitions++;
 
-            $totalEntries++;
+                if (count($elements = $element->find("//span[contains(@unbox, 'synonyms')]", Query::TYPE_XPATH)) != 0) { //check if definition has synonym
+                    $totalDefinitionsHaveSynonyms++;
 
-            if (count($elements = $wordDocument->find("//span[contains(@unbox, 'synonyms')]", Query::TYPE_XPATH)) != 0) { //check if word has synonym
-                $totalEntriesHaveSynonyms++;
-
-                echo 'Current entry has thesauruses: ' . $entryName . PHP_EOL;
+                    if (count($elements = $element->find('.def')) != 0) {
+                        echo 'Current definition has thesauruses: ' . $element->find('.def')[0]->text() . PHP_EOL;
+                    }
+                }
             }
         }
     }
 }
 
-echo 'Total entries have thesauruses/Total entries: ' . $totalEntriesHaveSynonyms . '/' . $totalEntries . PHP_EOL;
+echo 'Total definitions have thesauruses/Total definitions: ' . $totalDefinitionsHaveSynonyms . '/' . $totalDefinitions . PHP_EOL;
 echo 'Statistics from Oxford Advanced Learner’s Dictionary' . PHP_EOL;
 
 $endTime = microtime(true);

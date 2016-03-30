@@ -51,8 +51,8 @@ foreach ($wordsUrl as $wordUrl) {
             $totalWords += count($wordDocument->find('h1 .BASE'));
             $totalWords += count($wordDocument->find('#RUNON .BASE'));
 
-            if (count($elements = $wordDocument->find('.DEFINITION')) != 0) { //check if word has definitions
-                $totalDefinitions += count($wordDocument->find('.DEFINITION'));
+            if (count($elements = $wordDocument->find('.SENSE')) != 0) { //check if word has definitions
+                $totalDefinitions += count($wordDocument->find('.SENSE'));
 
                 echo 'Current entry has definitions: ' . $entryName . PHP_EOL;
             }

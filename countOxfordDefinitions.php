@@ -50,8 +50,8 @@ foreach ($wordsUrl as $wordUrl) {
 
             $totalWords += count($wordDocument->find('.h'));
 
-            if (count($elements = $wordDocument->find('.sn-g .def')) != 0) { //check if word has definitions
-                $totalDefinitions += count($wordDocument->find('.sn-g .def'));
+            if (count($elements = $wordDocument->find('.sn-g')) != 0) { //check if word has definitions
+                $totalDefinitions += count($wordDocument->find('.sn-g'));
 
                 echo 'Current entry has definitions: ' . $entryName . PHP_EOL;
             }

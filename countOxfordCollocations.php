@@ -36,8 +36,8 @@ foreach ($letters->find('#letters a') as $letterUrl) {
     }
 }
 
-$totalEntriesHaveCollocations = 0;
-$totalEntries = 0;
+$totalDefinitionsHaveCollocations = 0;
+$totalDefinitions = 0;
 foreach ($wordsUrl as $wordUrl) {
 
     if ($wordUrl != 'http://www.oxfordlearnersdictionaries.com/definition/english/nancy-drew') { //this link is NOT FOUND
@@ -46,20 +46,22 @@ foreach ($wordsUrl as $wordUrl) {
 
         if (count($elements = $wordDocument->find('.h')) != 0) { //check if word has name
 
-            $entryName = $wordDocument->find('.h')[0]->text();
+            $definition = $wordDocument->find('.h')[0]->text();
 
-            $totalEntries++;
+            foreach ($wordDocument->find('.sn-g') as $element){
+                $totalDefinitions++;
 
-            if (count($elements = $wordDocument->find("//span[contains(@unbox, 'colloc')]", Query::TYPE_XPATH)) != 0) { //check if word has collocation
-                $totalEntriesHaveCollocations++;
+                if (count($elements = $element->find("//span[contains(@unbox, 'colloc')]", Query::TYPE_XPATH)) != 0) { //check if definition has collocation
+                    $totalDefinitionsHaveCollocations++;
 
-                echo 'Current entry has collocations: ' . $entryName . PHP_EOL;
+                    echo 'Current definition has collocations: ' . $definition . PHP_EOL;
+                }
             }
         }
     }
 }
 
-echo 'Total entries have collocations/Total entries: ' . $totalEntriesHaveCollocations . '/' . $totalEntries . PHP_EOL;
+echo 'Total definitions have collocations/Total definitions: ' . $totalDefinitionsHaveCollocations . '/' . $totalDefinitions . PHP_EOL;
 echo 'Statistics from Oxford Advanced Learner’s Dictionary' . PHP_EOL;
 
 $endTime = microtime(true);

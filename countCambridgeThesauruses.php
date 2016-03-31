@@ -36,28 +36,25 @@ foreach ($letters->find('.cdo-browse-letters a') as $letterUrl) {
     }
 }
 
-$totalEntriesHaveSynonyms = 0;
-$totalEntries = 0;
+$totalDefinitionsHaveSynonyms = 0;
+$totalDefinitions = 0;
 foreach ($wordsUrl as $wordUrl) {
 
     $wordDocument = new Document($wordUrl, true);
 
-    if (count($elements = $wordDocument->find('#dataset-british .headword')) != 0) { //check if word has name
+    foreach ($wordDocument->find('#dataset-british .sense-block') as $element) {
+        $totalDefinitions += count($element->find('.def-head'));
 
-        $entryName = $wordDocument->find('#dataset-british .headword')[0]->text();
+        $totalDefinitionsHaveSynonyms += count($element->find('.cdo-smartt'));
 
-        $totalEntries++;
-
-        if (count($elements = $wordDocument->find('#dataset-british .cdo-topic')) != 0) { //check if word has synonym
-            $totalEntriesHaveSynonyms++;
-
-            echo 'Current entry has thesauruses: ' . $entryName . PHP_EOL;
+        if (count($elements = $element->find('.def')) != 0) {
+            echo 'Current definition has thesauruses: ' . $element->find('.def')[0]->text() . PHP_EOL;
         }
     }
 
 }
 
-echo 'Total entries have thesauruses/Total entries: ' . $totalEntriesHaveSynonyms . '/' . $totalEntries . PHP_EOL;
+echo 'Total definitions have thesauruses/Total definitions: ' . $totalDefinitionsHaveSynonyms . '/' . $totalDefinitions . PHP_EOL;
 echo 'Statistics from Cambridge Advanced Learner’s Dictionary & Thesaurus' . PHP_EOL;
 
 $endTime = microtime(true);

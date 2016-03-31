@@ -46,19 +46,20 @@ foreach ($wordsUrl as $wordUrl) {
 
         if (count($elements = $wordDocument->find('h1 .BASE')) != 0) { //check if word has name
             $entryName = $wordDocument->find('h1 .BASE')[0]->text();
-        }else{
+        } else {
             $entryName = '';
         }
 
         $totalWords += count($wordDocument->find('h1 .BASE'));
         $totalWords += count($wordDocument->find('#RUNON .BASE'));
 
-        if (count($elements = $wordDocument->find('.DEFINITION')) != 0) { //check if word has definitions
-            $totalDefinitions += count($wordDocument->find('.DEFINITION'));
-
-            echo 'Current entry has definitions: ' . $entryName . PHP_EOL;
+        foreach ($wordDocument->find('.SENSE') as $element) {
+            $totalDefinitions += count($element->find('.DEFINITION'));
         }
 
+        if (count($elements = $wordDocument->find('.DEFINITION')) != 0) {
+            echo 'Current entry has definitions: ' . $entryName . PHP_EOL;
+        }
     }
 }
 

@@ -48,9 +48,11 @@ foreach ($wordsUrl as $wordUrl) {
 
     if (count($elements = $wordDocument->find('#dataset-british .pos-header')) != 0) { //check if word has name
 
-        foreach ($wordDocument->find('#dataset-british .pos-header') as $element){
+        foreach ($wordDocument->find('#dataset-british .pos-header') as $element) {
 
-            $entryName = $element->find('.headword')[0]->text();
+            if (count($elements = $element->find('.headword')) != 0) {
+                $entryName = $element->find('.headword')[0]->text();
+            }
 
             if (count($elements = $element->find('.pos')) != 0) { //check if word has part of speech
                 $pos = $element->find('.pos')[0]->text(); //find part of speech of word

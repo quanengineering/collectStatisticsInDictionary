@@ -46,6 +46,8 @@ foreach ($wordsUrl as $wordUrl) {
 
     $wordDocument = new Document($wordUrl, true);
 
+    $entryName = $wordDocument->find('#dataset-british .headword')[0]->text();
+
     $A1 += count($wordDocument->find('#dataset-british .A1'));
     $A2 += count($wordDocument->find('#dataset-british .A2'));
     $B1 += count($wordDocument->find('#dataset-british .B1'));
@@ -53,6 +55,7 @@ foreach ($wordsUrl as $wordUrl) {
     $C1 += count($wordDocument->find('#dataset-british .C1'));
     $C2 += count($wordDocument->find('#dataset-british .C2'));
 
+    echo 'Current entry: ' . $entryName . PHP_EOL;
 }
 
 echo 'Total definitions in' . PHP_EOL;

@@ -49,8 +49,8 @@ foreach ($wordsUrl as $wordUrl) {
         $totalWords += count($wordDocument->find('#dataset-british .headword'));
         $totalWords += count($wordDocument->find('#dataset-british .runon'));
 
-        if (count($elements = $wordDocument->find('#dataset-british .def-head')) != 0) { //check if word has definitions
-            $totalDefinitions += count($wordDocument->find('#dataset-british .def-head'));
+        if (count($elements = $wordDocument->find('#dataset-british .sense-block .def-head')) != 0) { //check if word has definitions
+            $totalDefinitions += count($wordDocument->find('#dataset-british .sense-block .def-head'));
 
             echo 'Current entry has definitions: ' . $entryName . PHP_EOL;
         }

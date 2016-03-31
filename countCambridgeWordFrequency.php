@@ -46,7 +46,9 @@ foreach ($wordsUrl as $wordUrl) {
 
     $wordDocument = new Document($wordUrl, true);
 
-    $entryName = $wordDocument->find('#dataset-british .headword')[0]->text();
+    if (count($elements = $wordDocument->find('#dataset-british .headword')) != 0) {
+        $entryName = $wordDocument->find('#dataset-british .headword')[0]->text();
+    }
 
     $A1 += count($wordDocument->find('#dataset-british .A1'));
     $A2 += count($wordDocument->find('#dataset-british .A2'));

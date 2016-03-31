@@ -50,7 +50,7 @@ foreach ($wordsUrl as $wordUrl) {
             if (count($elements = $element->find('.ONEBOX-HEAD')) != 0) { //check if word has additional boxes
                 $item = $element->find('.ONEBOX-HEAD')[0]->text();
                 if (substr($item, 0, strrpos($item, ':')) == 'Collocates') { //check if definition has collocation
-                    $totalDefinitionsHaveCollocations++;
+                    $totalDefinitionsHaveCollocations += count($element->find('.DEFINITION'));
 
                     if (count($elements = $element->find('.DEFINITION')) != 0) {
                         echo 'Current definition has collocations: ' . $element->find('.DEFINITION')[0]->text() . PHP_EOL;

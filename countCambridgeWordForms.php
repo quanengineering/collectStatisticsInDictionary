@@ -46,38 +46,40 @@ foreach ($wordsUrl as $wordUrl) {
 
     $wordDocument = new Document($wordUrl, true);
 
-    if (count($elements = $wordDocument->find('#dataset-british .headword')) != 0) { //check if word has name
+    if (count($elements = $wordDocument->find('#dataset-british .pos-header')) != 0) { //check if word has name
 
-        $entryName = $wordDocument->find('#dataset-british .headword')[0]->text();
+        foreach ($wordDocument->find('#dataset-british .pos-header') as $element){
 
-        if (count($elements = $wordDocument->find('#dataset-british .pos')) != 0) { //check if word has part of speech
-            $pos = $wordDocument->find('#dataset-british .pos')[0]->text(); //find part of speech of word
-            if ($pos == 'noun') {
-                $totalNounEntries++;
-                if (count($elements = $wordDocument->find('#dataset-british')[0]->find("//span[contains(@type, 'plural')]", Query::TYPE_XPATH)) != 0) { //check if word has noun forms
+            $entryName = $element->find('.headword')[0]->text();
 
-                    $totalEntriesHaveNounForms++;
+            if (count($elements = $element->find('.pos')) != 0) { //check if word has part of speech
+                $pos = $element->find('.pos')[0]->text(); //find part of speech of word
+                if ($pos == 'noun') {
+                    $totalNounEntries++;
+                    if (count($elements = $element->find("//span[contains(@type, 'plural')]", Query::TYPE_XPATH)) != 0) { //check if word has noun forms
 
-                    echo 'Current entry has noun forms: ' . $entryName . PHP_EOL;
-                }
-            } elseif ($pos == 'adjective') {
-                $totalAdjectiveEntries++;
-                if (count($elements = $wordDocument->find('#dataset-british .irreg-infls')) != 0) { //check if word has adjective forms
+                        $totalEntriesHaveNounForms++;
 
-                    $totalEntriesHaveAdjectiveForms++;
+                        echo 'Current entry has noun forms: ' . $entryName . PHP_EOL;
+                    }
+                } elseif ($pos == 'adjective') {
+                    $totalAdjectiveEntries++;
+                    if (count($elements = $element->find('.irreg-infls')) != 0) { //check if word has adjective forms
 
-                    echo 'Current entry has adjective forms: ' . $entryName . PHP_EOL;
-                }
-            } elseif ($pos == 'verb') {
-                $totalVerbEntries++;
-                if (count($elements = $wordDocument->find('#dataset-british .irreg-infls')) != 0) { //check if word has verb forms
+                        $totalEntriesHaveAdjectiveForms++;
 
-                    $totalEntriesHaveVerbForms++;
+                        echo 'Current entry has adjective forms: ' . $entryName . PHP_EOL;
+                    }
+                } elseif ($pos == 'verb') {
+                    $totalVerbEntries++;
+                    if (count($elements = $element->find('.irreg-infls')) != 0) { //check if word has verb forms
 
-                    echo 'Current entry has verb forms: ' . $entryName . PHP_EOL;
+                        $totalEntriesHaveVerbForms++;
+
+                        echo 'Current entry has verb forms: ' . $entryName . PHP_EOL;
+                    }
                 }
             }
-
         }
     }
 

@@ -36,7 +36,7 @@ $totalWords = 0;
 foreach ($subCategoriesUrl as $subCategoryUrl) {
     $document = new Document($subCategoryUrl, true);
 
-    $totalWords += count($document->find('.ws-head'));
+    $totalWords += count($document->find('.wswd'));
 }
 
 echo 'Total thesauruses subcategories/Total words in thesauruses subcategories: ' . count($subCategoriesUrl) . '/' . $totalWords . PHP_EOL;

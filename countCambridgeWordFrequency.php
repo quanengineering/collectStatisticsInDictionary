@@ -48,6 +48,8 @@ foreach ($wordsUrl as $wordUrl) {
 
     if (count($elements = $wordDocument->find('#dataset-british .headword')) != 0) {
         $entryName = $wordDocument->find('#dataset-british .headword')[0]->text();
+    }else{
+        $entryName = '';
     }
 
     $A1 += count($wordDocument->find('#dataset-british .A1'));
@@ -67,7 +69,7 @@ echo 'B1: Intermediate level:' . $B1 . PHP_EOL;
 echo 'B2: Upper-Intermediate level:' . $B2 . PHP_EOL;
 echo 'C1: Advanced level:' . $C1 . PHP_EOL;
 echo 'C2: Proficiency level:' . $C2 . PHP_EOL;
-echo 'All level:' . $A1 + $A2 + $B1 + $B2 + $C1 + $C2 . PHP_EOL;
+echo 'All level:' . ($A1 + $A2 + $B1 + $B2 + $C1 + $C2) . PHP_EOL;
 echo 'Statistics from Cambridge Advanced Learner’s Dictionary & Thesaurus' . PHP_EOL;
 
 $endTime = microtime(true);

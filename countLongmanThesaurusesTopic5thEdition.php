@@ -32,7 +32,7 @@ $totalMoreFrequentlyWords = 0;
 $totalFrequentlyWords = 0;
 $totalLessFrequentlyWords = 0;
 $totalLessAndLessFrequentlyWords = 0;
-$wordsNotDividedByFrequency = 0;
+$totalWordsNotDividedByFrequency = 0;
 $totalWords = 0;
 foreach ($subCategoriesUrl as $subCategoryUrl) {
     $document = new Document('http://www.ldoceonline.com' . $subCategoryUrl, true);

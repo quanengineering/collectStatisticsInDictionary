@@ -40,7 +40,7 @@ foreach ($subCategoriesUrl as $subCategoryUrl) {
 }
 
 echo 'Total thesauruses subcategories/Total words in thesauruses subcategories: ' . count($subCategoriesUrl) . '/' . $totalWords . PHP_EOL;
-echo 'Statistics from Longman Dictionary of Contemporary English' . PHP_EOL;
+echo 'Statistics from Longman Dictionary of Contemporary English 6th Edition' . PHP_EOL;
 
 $endTime = microtime(true);
 $executionTime = ($endTime - $startTime) / 60;

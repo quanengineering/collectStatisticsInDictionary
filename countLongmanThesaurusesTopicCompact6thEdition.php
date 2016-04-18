@@ -983,20 +983,34 @@ $subjectUrl = array(
 );
 
 $sectionUrl = array();
-foreach ($subjectUrl as $element){
+foreach ($subjectUrl as $element) {
     $url = 'http://global.longmandictionaries.com/activator_search/get_section_menu/' . $element;
     $jsonArray = json_decode(file_get_contents($url), true);
-    for($i= 0; $i < count($jsonArray['sections']); $i++){
-        $sectionUrl[] = $jsonArray['sections'][$i]['section_id'];
-        echo $jsonArray['sections'][$i]['section_id'] . PHP_EOL;
+
+    if (array_key_exists('section_groups', $jsonArray)) {
+
+        for ($j = 0; $j < count($jsonArray['section_groups']); $j++) {
+            for ($i = 0; $i < count($jsonArray['section_groups'][$j]['sections']); $i++) {
+                $sectionUrl[] = $jsonArray['section_groups'][$j]['sections'][$i]['section_id'];
+                echo $jsonArray['section_groups'][$j]['sections'][$i]['section_id'] . PHP_EOL;
+            }
+        }
+
+    } else {
+
+        for ($i = 0; $i < count($jsonArray['sections']); $i++) {
+            $sectionUrl[] = $jsonArray['sections'][$i]['section_id'];
+            echo $jsonArray['sections'][$i]['section_id'] . PHP_EOL;
+        }
+
     }
 }
 
 $totalWords = 0;
-foreach ($sectionUrl as $element){
+foreach ($sectionUrl as $element) {
     $url = 'http://global.longmandictionaries.com/activator_search/get_section/' . $element;
-    $document = new Document($url,true);
-    $totalWords = count($document->find('.exponent'));
+    $document = new Document($url, true);
+    $totalWords += count($document->find('.exponent'));
 }
 
 echo 'Total thesauruses subcategories/Total words in thesauruses subcategories: ' . count($sectionUrl) . '/' . $totalWords . PHP_EOL;

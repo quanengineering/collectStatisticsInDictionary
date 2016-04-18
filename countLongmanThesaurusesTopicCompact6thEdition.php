@@ -1011,6 +1011,7 @@ foreach ($sectionUrl as $element) {
     $url = 'http://global.longmandictionaries.com/activator_search/get_section/' . $element;
     $document = new Document($url, true);
     $totalWords += count($document->find('.exponent'));
+    echo $element . PHP_EOL;
 }
 
 echo 'Total thesauruses subcategories/Total words in thesauruses subcategories: ' . count($sectionUrl) . '/' . $totalWords . PHP_EOL;

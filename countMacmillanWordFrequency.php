@@ -52,7 +52,7 @@ foreach ($wordsUrl as $wordUrl) {
             $entryName = '';
         }
 
-        if (count($elements = $wordDocument->find('.redword')) != 0) {
+        if (count($elements = $wordDocument->find('#headword .redword')) != 0) {
             $frequency = $wordDocument->find('.icon_star');
             $frequency = count($frequency);
 

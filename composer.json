@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "imangazaliev/didom": "1.6.3",
-    "box/spout": "v2.4.2"
+    "imangazaliev/didom": "1.6.7",
+    "box/spout": "v2.4.4"
   }
 }

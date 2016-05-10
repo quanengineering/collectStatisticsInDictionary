@@ -16,6 +16,7 @@ DiDOM - simple and fast HTML parser.
 - [Creating new document](#creating-new-document)
 - [Search for elements](#search-for-elements)
 - [Verify if element exists](#verify-if-element-exists)
+- [Supported selectors](#supported-selectors)
 - [Output](#output)
 - [Creating a new element](#creating-a-new-element)
 - [Getting parent element](#getting-parent-element)
@@ -55,7 +56,7 @@ DiDom allows to load HTML in several ways:
 ```php    
 // the first parameter is a string with HTML
 $document = new Document($html);
-    
+
 // file path
 $document = new Document('page.html', true);
 
@@ -69,12 +70,20 @@ The second parameter specifies if you need to load file. Default is `false`.
 
 ```php
 $document = new Document();
-    
+
 $document->loadHtml($html);
-    
+
 $document->loadHtmlFile('page.html');
 
 $document->loadHtmlFile('http://www.example.com/');
+```
+
+There are two methods available for loading XML: `loadXml` and `loadXmlFile`.
+
+These methods accept additional options:
+
+```php
+$document->loadHtml($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 ```
 
 ## Search for elements
@@ -145,6 +154,53 @@ if (count($elements = $document->find('.post')) != 0) {
 
 because in the first case it makes two requests.
 
+## Supported selectors
+
+DiDom supports search by:
+
+- tag
+- class, ID, name and value of an attribute
+- pseudo-classes:
+    - first-, last-, nth-child
+    - empty and not-empty
+    - contains
+
+```php
+// all links
+$document->find('a');
+
+// any element with id = "foo" and "bar" class
+$document->find('#foo.bar');
+
+// any element with attribute "name"
+$document->find('[name]');
+// the same as
+$document->find('*[name]');
+
+// input field with the name "foo"
+$document->find('input[name=foo]');
+$document->find('input[name=\'bar\']');
+$document->find('input[name="baz"]');
+
+// any element that has an attribute starting with "data-" and the value "foo"
+$document->find('*[^data-=foo]');
+
+// all links starting with https
+$document->find('a[href^=https]');
+
+// all images with the extension png
+$document->find('img[src$=png]');
+
+// all links containing the string "example.com"
+$document->find('a[href*=example.com]');
+
+// text of the links with "foo" class
+$document->find('a.foo::text');
+
+// address and title af all the fields with "bar" class
+$document->find('a.bar::attr(href|title)');
+```
+
 ## Output
 
 ### Getting HTML
@@ -161,6 +217,7 @@ echo $posts[0]->html();
 ```php
 $html = (string) $posts[0];
 ```
+
 ##### Formatting HTML output
 
 ```php
@@ -172,6 +229,24 @@ An element does not have `format()` method, so if you need to output formatted H
 
 ```php
 $html = $element->toDocument()->format()->html();
+```
+
+#### Inner HTML
+
+```php
+$innerHtml = $element->innerHtml();
+```
+
+Document does not have the method `innerHtml()`, therefore, if you need to get inner HTML of a document, convert it into an element first:
+
+```php
+$innerHtml = $document->toElement()->innerHtml();
+```
+
+#### Additional parameters
+
+```php
+$html = $document->format()->html(LIBXML_NOEMPTYTAG);
 ```
 
 ### Getting content
@@ -319,6 +394,21 @@ var_dump($element->is($element));
 var_dump($element->is($element2));
 ```
 
+## Appending child elements
+
+```php
+$list = new Element('ul');
+
+$item = new Element('li', 'Item 1');
+$items = [
+    new Element('li', 'Item 2'),
+    new Element('li', 'Item 3'),
+];
+
+$list->appendChild($item);
+$list->appendChild($items);
+```
+
 ## Replacing element
 
 ```php
@@ -354,4 +444,4 @@ Query::setCompiled(['h2' => '//h2']);
 
 ## Comparison with other parsers
 
-[Comparison with other parsers](https://github.com/Imangazaliev/DiDOM/wiki/Comparison-with-other-parsers)
+[Comparison with other parsers](https://github.com/Imangazaliev/DiDOM/wiki/Comparison-with-other-parsers-(1.6.3))

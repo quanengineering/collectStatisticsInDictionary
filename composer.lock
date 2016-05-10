@@ -4,21 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "da1b52de309e32d6927c01449e94176d",
-    "content-hash": "fa1389737d5abed7b3e300b15211c316",
+    "hash": "2f0b67567df333d9c33299599ab5b814",
     "packages": [
         {
             "name": "box/spout",
-            "version": "v2.4.2",
+            "version": "v2.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/box/spout.git",
-                "reference": "771afcb5f1c0114105c1f084e280116d6da9eb25"
+                "reference": "e9cd7a397e91e4f6b624a37c3fb73ea605f08e90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/box/spout/zipball/771afcb5f1c0114105c1f084e280116d6da9eb25",
-                "reference": "771afcb5f1c0114105c1f084e280116d6da9eb25",
+                "url": "https://api.github.com/repos/box/spout/zipball/e9cd7a397e91e4f6b624a37c3fb73ea605f08e90",
+                "reference": "e9cd7a397e91e4f6b624a37c3fb73ea605f08e90",
                 "shasum": ""
             },
             "require": {
@@ -75,20 +74,20 @@
                 "write",
                 "xlsx"
             ],
-            "time": "2016-02-14 08:20:48"
+            "time": "2016-04-12 18:03:15"
         },
         {
             "name": "imangazaliev/didom",
-            "version": "1.6.3",
+            "version": "1.6.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Imangazaliev/DiDOM.git",
-                "reference": "e492feae44321e2f4882f6e9466614732822f008"
+                "reference": "8e29148bbb5c9f1d4ca8e1c4b882e0326a389201"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Imangazaliev/DiDOM/zipball/e492feae44321e2f4882f6e9466614732822f008",
-                "reference": "e492feae44321e2f4882f6e9466614732822f008",
+                "url": "https://api.github.com/repos/Imangazaliev/DiDOM/zipball/8e29148bbb5c9f1d4ca8e1c4b882e0326a389201",
+                "reference": "8e29148bbb5c9f1d4ca8e1c4b882e0326a389201",
                 "shasum": ""
             },
             "require": {
@@ -121,7 +120,7 @@
                 "parser",
                 "xml"
             ],
-            "time": "2016-03-16 15:41:59"
+            "time": "2016-04-22 18:01:52"
         }
     ],
     "packages-dev": [],

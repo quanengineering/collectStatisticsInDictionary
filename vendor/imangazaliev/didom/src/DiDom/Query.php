@@ -10,7 +10,7 @@ class Query
     /**
      * Types of expressions.
      * 
-     * @string
+     * @const string
      */
     const TYPE_XPATH = 'XPATH';
     const TYPE_CSS   = 'CSS';
@@ -23,8 +23,8 @@ class Query
     /**
      * Converts a CSS selector into an XPath expression.
      *
-     * @param  string $expression XPath expression or CSS selector
-     * @param  string $type the type of the expression
+     * @param string $expression XPath expression or CSS selector
+     * @param string $type The type of the expression
      *
      * @return string XPath expression
      */
@@ -42,6 +42,7 @@ class Query
 
             if (array_key_exists($selector, static::$compiled)) {
                 $paths[] = static::$compiled[$selector];
+
                 continue;
             }
 
@@ -56,8 +57,8 @@ class Query
     /**
      * Converts a CSS selector into an XPath expression.
      * 
-     * @param  string $selector a CSS selector
-     * @param  string $prefix specifies the nesting of nodes
+     * @param string $selector A CSS selector
+     * @param string $prefix Specifies the nesting of nodes
      *
      * @return string XPath expression
      */
@@ -65,6 +66,16 @@ class Query
     {
         $segments = self::getSegments($selector);
         $xpath = '';
+
+        $pos = strrpos($selector, '::');
+
+        if ($pos !== false) {
+            $property = substr($selector, $pos+2);
+            $property = self::parseProperty($property);
+            $property = self::convertProperty($property['name'], $property['args']);
+
+            $selector = substr($selector, 0, $pos);
+        }
 
         while (count($segments) > 0) {
             $xpath .= self::buildXpath($segments, $prefix);
@@ -79,12 +90,64 @@ class Query
             $segments = self::getSegments($selector);
         }
 
+        if (isset($property)) {
+            $xpath = $xpath.'/'.$property;
+        }
+
         return $xpath;
     }
 
     /**
-     * @param  array  $segments
-     * @param  string $prefix specifies the nesting of nodes
+     * @param string $property
+     * 
+     * @return array
+     */
+    protected static function parseProperty($property)
+    {
+        $name = '(?P<name>[\w\-]*)';
+        $args = '(?:\((?P<args>[^\)]+)\))';
+        $regexp = '/(?:'.$name.$args.'?)?/is';
+
+        if (preg_match($regexp, $property, $segments)) {
+            $result = [];
+
+            $result['name'] = $segments['name'];
+            $result['args'] = isset($segments['args']) ? explode('|', $segments['args']) : [];
+
+            return $result;
+        }
+
+        throw new RuntimeException('Invalid selector');
+    }
+
+    /**
+     * @param string $name
+     * @param array  $args
+     * 
+     * @return string
+     */
+    protected static function convertProperty($name, $args = [])
+    {
+        if ($name === 'text') {
+            return 'text()';
+        }
+
+        if ($name === 'attr') {
+            $attributes = [];
+
+            foreach ($args as $attribute) {
+                $attributes[] = sprintf('name() = "%s"', $attribute);
+            }
+
+            return sprintf('@*[%s]', implode(' or ', $attributes));
+        }
+
+        throw new RuntimeException('Invalid selector: unknown property type');
+    }
+
+    /**
+     * @param array  $segments
+     * @param string $prefix Specifies the nesting of nodes
      *
      * @return string XPath expression
      *
@@ -115,8 +178,8 @@ class Query
 
         // if the pseudo class specified
         if (isset($segments['pseudo'])) {
-            $expression   = isset($segments['expr']) ? $segments['expr'] : '';
-            $attributes[] = self::convertPseudo($segments['pseudo'], $expression);
+            $expression   = isset($segments['expr']) ? trim($segments['expr']) : '';
+            $attributes[] = self::convertPseudo($segments['pseudo'], explode(',', $expression));
         }
 
         if (count($attributes) === 0 and !isset($segments['tag'])) {
@@ -134,15 +197,17 @@ class Query
     }
 
     /**
-     * @param string  $name Attribute name.
-     * @param string  $value Attribute value.
+     * @param string $name  The attribute name
+     * @param string $value The attribute value
      * 
      * @return string
      */
     protected static function convertAttribute($name, $value)
     {
         if (substr($name, 0, 1) === '^') {
-            return sprintf('@*[starts-with(name(), "%s")]', substr($name, 1));
+            $xpath = sprintf('@*[starts-with(name(), "%s")]', substr($name, 1));
+
+            return $value === null ? $xpath : sprintf('%s="%s"', $xpath, $value);
         }
 
         switch (substr($name, -1)) {
@@ -167,14 +232,14 @@ class Query
     /**
      * Converts a CSS pseudo-class into an XPath expression.
      * 
-     * @param  string $pseudo pseudo-class
-     * @param  string $expression expression for the nth-child (optional)
+     * @param string $pseudo Pseudo-class
+     * @param string $parameters
      *
      * @return string
      *
      * @throws \RuntimeException if passed an unknown pseudo-class
      */
-    protected static function convertPseudo($pseudo, $expression = null)
+    protected static function convertPseudo($pseudo, $parameters = [])
     {
         switch ($pseudo) {
             case 'first-child':
@@ -190,10 +255,13 @@ class Query
                 return 'count(descendant::*) > 0';
                 break;
             case 'nth-child':
-                return self::convertNthChildExpression($expression);
+                return self::convertNthChildExpression($parameters[0]);
                 break;
             case 'contains':
-                return sprintf('lower-case(.) = lower-case("%s")', trim($expression, '\'"'));
+                $string = trim($parameters[0], ' \'"');
+                $caseSensetive = isset($parameters[1]) and (trim($parameters[1]) === 'true');
+
+                return self::convertContains($string, $caseSensetive);
                 break;
         }
 
@@ -203,7 +271,7 @@ class Query
     /**
      * Converts nth-child expression into an XPath expression.
      * 
-     * @param  string $expression nth-expression
+     * @param string $expression nth-expression
      * 
      * @return string
      * 
@@ -236,9 +304,28 @@ class Query
     }
 
     /**
+     * @param string $string
+     * @param bool   $caseSensetive
+     * 
+     * @return string
+     */
+    protected static function convertContains($string, $caseSensetive = false)
+    {
+        if ($caseSensetive) {
+            return sprintf('text() = "%s"', $string);
+        }
+
+        if (function_exists('mb_strtolower')) {
+            return sprintf('php:functionString("mb_strtolower", .) = php:functionString("mb_strtolower", "%s")', $string);
+        } else {
+            return sprintf('php:functionString("strtolower", .) = php:functionString("strtolower", "%s")', $string);
+        }
+    }
+
+    /**
      * Splits the CSS selector into parts (tag name, ID, classes, attributes, pseudo-class).
      * 
-     * @param  string $selector CSS selector
+     * @param string $selector CSS selector
      *
      * @return array
      *
@@ -257,9 +344,9 @@ class Query
         $id = '(?:#(?P<id>[\w|\-]+))?';
         $classes = '(?P<classes>\.[\w|\-|\.]+)*';
         $attrs = '(?P<attrs>\[.+\])*';
-        $child = '(?P<pseudo>[\w\-]*)';
+        $name = '(?P<pseudo>[\w\-]*)';
         $expr = '(?:\((?P<expr>[^\)]+)\))';
-        $pseudo = '(?::'.$child.$expr.'?)?';
+        $pseudo = '(?::'.$name.$expr.'?)?';
         $rel = '\s*(?P<rel>>)?';
 
         $regexp = '/'.$tag.$id.$classes.$attrs.$pseudo.$rel.'/is';
@@ -329,7 +416,7 @@ class Query
     }
 
     /**
-     * @param  array $compiled
+     * @param array $compiled
      *
      * @throws \InvalidArgumentException if the attributes is not an array
      */

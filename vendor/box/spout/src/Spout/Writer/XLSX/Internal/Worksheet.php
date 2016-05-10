@@ -146,7 +146,7 @@ EOD;
                     $cellXML .= ' t="s"><v>' . $sharedStringId . '</v></c>';
                 }
             } else if (CellHelper::isBoolean($cellValue)) {
-                $cellXML .= ' t="b"><v>' . $cellValue . '</v></c>';
+                    $cellXML .= ' t="b"><v>' . intval($cellValue) . '</v></c>';
             } else if (CellHelper::isNumeric($cellValue)) {
                 $cellXML .= '><v>' . $cellValue . '</v></c>';
             } else if (empty($cellValue)) {
@@ -178,6 +178,10 @@ EOD;
      */
     public function close()
     {
+        if (!is_resource($this->sheetFilePointer)) {
+            return;
+        }
+
         fwrite($this->sheetFilePointer, '</sheetData>');
         fwrite($this->sheetFilePointer, '</worksheet>');
         fclose($this->sheetFilePointer);

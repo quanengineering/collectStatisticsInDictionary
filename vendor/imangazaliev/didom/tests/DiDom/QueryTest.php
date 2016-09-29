@@ -71,6 +71,22 @@ class QueryTest extends TestCase
         Query::compile('li:nth-child(foo)');
     }
 
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testGetSegmentsWithEmptyClass()
+    {
+        Query::getSegments('.');
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testCompilehWithEmptyClass()
+    {
+        Query::compile('span.');
+    }
+
     public function testCompileXpath()
     {
         $this->assertEquals('//div', Query::compile('//div', Query::TYPE_XPATH));
@@ -111,6 +127,8 @@ class QueryTest extends TestCase
     {
         $compiled = [
             ['a', '//a'],
+            ['foo bar baz', '//foo//bar//baz'],
+            ['foo > bar > baz', '//foo/bar/baz'],
             ['#foo', '//*[@id="foo"]'],
             ['.bar', '//*[contains(concat(" ", normalize-space(@class), " "), " bar ")]'],
             ['*[foo=bar]', '//*[@foo="bar"]'],
@@ -121,25 +139,38 @@ class QueryTest extends TestCase
             ['a[href^=https]', '//a[starts-with(@href, "https")]'],
             ['img[src$=png]', '//img[ends-with(@src, "png")]'],
             ['a[href*=exapmle.com]', '//a[contains(@href, "exapmle.com")]'],
-            ['foo bar baz', '//foo//bar//baz'],
-            ['foo > bar > baz', '//foo/bar/baz'],
+            ['script[!src]', '//script[not(@src)]'],
+            ['a[href!="http://foo.com/"]', '//a[not(@href="http://foo.com/")]'],
+            ['a[foo~="bar"]', '//a[contains(concat(" ", normalize-space(@foo), " "), " bar ")]'],
             ['input, textarea, select', '//input|//textarea|//select'],
             ['li:first-child', '//li[position() = 1]'],
             ['li:last-child', '//li[position() = last()]'],
             ['ul:empty', '//ul[count(descendant::*) = 0]'],
             ['ul:not-empty', '//ul[count(descendant::*) > 0]'],
-            ['li:nth-child(odd)', '//li[(position() -1) mod 2 = 0 and position() >= 1]'],
-            ['li:nth-child(even)', '//li[position() mod 2 = 0 and position() >= 0]'],
-            ['li:nth-child(3)', '//li[position() = 3]'],
-            ['li:nth-child(-3)', '//li[position() = -3]'],
-            ['li:nth-child(3n)', '//li[(position() + 0) mod 3 = 0 and position() >= 0]'],
-            ['li:nth-child(3n+1)', '//li[(position() - 1) mod 3 = 0 and position() >= 1]'],
-            ['li:nth-child(3n-1)', '//li[(position() + 1) mod 3 = 0 and position() >= 1]'],
-            ['li:nth-child(n+3)', '//li[(position() - 3) mod 1 = 0 and position() >= 3]'],
-            ['li:nth-child(n-3)', '//li[(position() + 3) mod 1 = 0 and position() >= 3]'],
+            ['li:nth-child(odd)', '//*[(name()="li") and (position() mod 2 = 1 and position() >= 1)]'],
+            ['li:nth-child(even)', '//*[(name()="li") and (position() mod 2 = 0 and position() >= 0)]'],
+            ['li:nth-child(3)', '//*[(name()="li") and (position() = 3)]'],
+            ['li:nth-child(-3)', '//*[(name()="li") and (position() = -3)]'],
+            ['li:nth-child(3n)', '//*[(name()="li") and ((position() + 0) mod 3 = 0 and position() >= 0)]'],
+            ['li:nth-child(3n+1)', '//*[(name()="li") and ((position() - 1) mod 3 = 0 and position() >= 1)]'],
+            ['li:nth-child(3n-1)', '//*[(name()="li") and ((position() + 1) mod 3 = 0 and position() >= 1)]'],
+            ['li:nth-child(n+3)', '//*[(name()="li") and ((position() - 3) mod 1 = 0 and position() >= 3)]'],
+            ['li:nth-child(n-3)', '//*[(name()="li") and ((position() + 3) mod 1 = 0 and position() >= 3)]'],
+            ['li:nth-of-type(odd)', '//li[position() mod 2 = 1 and position() >= 1]'],
+            ['li:nth-of-type(even)', '//li[position() mod 2 = 0 and position() >= 0]'],
+            ['li:nth-of-type(3)', '//li[position() = 3]'],
+            ['li:nth-of-type(-3)', '//li[position() = -3]'],
+            ['li:nth-of-type(3n)', '//li[(position() + 0) mod 3 = 0 and position() >= 0]'],
+            ['li:nth-of-type(3n+1)', '//li[(position() - 1) mod 3 = 0 and position() >= 1]'],
+            ['li:nth-of-type(3n-1)', '//li[(position() + 1) mod 3 = 0 and position() >= 1]'],
+            ['li:nth-of-type(n+3)', '//li[(position() - 3) mod 1 = 0 and position() >= 3]'],
+            ['li:nth-of-type(n-3)', '//li[(position() + 3) mod 1 = 0 and position() >= 3]'],
+            ['ul:has(li.item)', '//ul[.//li[contains(concat(" ", normalize-space(@class), " "), " item ")]]'],
             ['ul li a::text', '//ul//li//a/text()'],
+            ['ul li a::text()', '//ul//li//a/text()'],
             ['ul li a::attr(href)', '//ul//li//a/@*[name() = "href"]'],
             ['ul li a::attr(href|title)', '//ul//li//a/@*[name() = "href" or name() = "title"]'],
+            ['> ul li a', '/ul//li//a'],
         ];
 
         if (function_exists('mb_strtolower')) {
@@ -170,6 +201,11 @@ class QueryTest extends TestCase
             '//a[@href]',
             '//a[@href="http://example.com/"]',
             '//a[(@href="http://example.com/") and (@title="Example Domain")]',
+            '//a[(@target="_blank") and (starts-with(@href, "https"))]',
+            '//a[ends-with(@href, ".com")]',
+            '//a[contains(@href, "example")]',
+            '//a[not(@href="http://foo.com/")]',
+            '//script[not(@src)]',
             '//li[position() = 1]',
             '//*[(@id="id") and (contains(concat(" ", normalize-space(@class), " "), " foo ")) and (@name="value") and (position() = 1)]',
         ];
@@ -183,6 +219,11 @@ class QueryTest extends TestCase
             ['tag' => 'a', 'attributes' => ['href' => null]],
             ['tag' => 'a', 'attributes' => ['href' => 'http://example.com/']],
             ['tag' => 'a', 'attributes' => ['href' => 'http://example.com/', 'title' => 'Example Domain']], // 
+            ['tag' => 'a', 'attributes' => ['target' => '_blank', 'href^' => 'https']],
+            ['tag' => 'a', 'attributes' => ['href$' => '.com']],
+            ['tag' => 'a', 'attributes' => ['href*' => 'example']],
+            ['tag' => 'a', 'attributes' => ['href!' => 'http://foo.com/']],
+            ['tag' => 'script', 'attributes' => ['!src' => null]],
             ['tag' => 'li', 'pseudo' => 'first-child'],
             ['tag' => '*', 'id' => 'id', 'classes' => ['foo'], 'attributes' => ['name' => 'value'], 'pseudo' => 'first-child', 'rel' => '>'],
         ];
@@ -210,6 +251,7 @@ class QueryTest extends TestCase
             ['selector' => 'a[href=\'http://example.com/\']', 'tag' => 'a', 'attributes' => ['href' => 'http://example.com/']],
             ['selector' => 'a[href=http://example.com/][title=Example Domain]', 'tag' => 'a', 'attributes' => ['href' => 'http://example.com/', 'title' => 'Example Domain']],
             ['selector' => 'a[href=http://example.com/][href=http://example.com/404]', 'tag' => 'a', 'attributes' => ['href' => 'http://example.com/404']],
+            ['selector' => 'a[href^=https]', 'tag' => 'a', 'attributes' => ['href^' => 'https']],
             ['selector' => 'li:first-child', 'tag' => 'li', 'pseudo' => 'first-child'],
             ['selector' => 'ul >', 'tag' => 'ul', 'rel' => '>'],
             ['selector' => '#id.foo[name=value]:first-child >', 'tag' => '*', 'id' => 'id', 'classes' => ['foo'], 'attributes' => ['name' => 'value'], 'pseudo' => 'first-child', 'rel' => '>'],

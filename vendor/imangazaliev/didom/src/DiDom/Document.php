@@ -41,6 +41,8 @@ class Document
 
         $this->document = new DOMDocument('1.0', $encoding);
 
+        $this->preserveWhiteSpace(false);
+
         if ($string !== null) {
             $this->load($string, $isFile, $type);
         }
@@ -63,7 +65,7 @@ class Document
     }
 
     /**
-     * Adds new child at the end of the children.
+     * Add new child at the end of the children.
      * 
      * @param \DiDom\Element|\DOMNode|array $nodes The appended child
      *
@@ -84,15 +86,33 @@ class Document
                 throw new InvalidArgumentException(sprintf('Argument 1 passed to %s must be an instance of %s\Element or DOMNode, %s given', __METHOD__, __NAMESPACE__, (is_object($node) ? get_class($node) : gettype($node))));
             }
 
-            $this->displayErrors(false);
+            Errors::disable();
 
             $cloned = $node->cloneNode(true);
             $newNode = $this->document->importNode($cloned, true);
 
             $this->document->appendChild($newNode);
 
-            $this->displayErrors(true);
+            Errors::restore();
         }
+
+        return $this;
+    }
+
+    /**
+     * Set preserveWhiteSpace property.
+     * 
+     * @param bool $value
+     * 
+     * @return \DiDom\Document
+     */
+    public function preserveWhiteSpace($value = true)
+    {
+        if (!is_bool($value)) {
+            throw new InvalidArgumentException(sprintf('%s expects parameter 1 to be boolean, %s given', __METHOD__, gettype($value)));
+        }
+
+        $this->document->preserveWhiteSpace = $value;
 
         return $this;
     }
@@ -119,6 +139,8 @@ class Document
             throw new InvalidArgumentException(sprintf('%s expects parameter 4 to be integer, %s given', __METHOD__, (is_object($options) ? get_class($options) : gettype($options))));
         }
 
+        $string = trim($string);
+
         if ($isFile) {
             $string = $this->loadFile($string);
         }
@@ -131,26 +153,13 @@ class Document
 
         $this->type = strtolower($type);
 
-        $this->displayErrors(false);
+        Errors::disable();
 
         $this->type === 'xml' ? $this->document->loadXml($string, $options) : $this->document->loadHtml($string, $options);
 
-        $this->displayErrors(true);
+        Errors::restore();
 
         return $this;
-    }
-
-    protected function displayErrors($display = true)
-    {
-        if ($display) {
-            libxml_clear_errors();
-
-            libxml_disable_entity_loader(false);
-            libxml_use_internal_errors(false);
-        } else {
-            libxml_use_internal_errors(true);
-            libxml_disable_entity_loader(true);
-        }
     }
 
     /**
@@ -259,7 +268,12 @@ class Document
      */
     public function has($expression, $type = Query::TYPE_CSS)
     {
-        return count($this->find($expression, $type)) > 0;
+        $xpath = new DOMXPath($this->document);
+
+        $expression = Query::compile($expression, $type);
+        $expression = sprintf('count(%s) > 0', $expression);
+
+        return $xpath->evaluate($expression);
     }
 
     /**
@@ -281,29 +295,12 @@ class Document
         $xpath->registerPhpFunctions();
 
         $nodeList = $xpath->query($expression);
-        $result   = array();
+
+        $result = [];
 
         if ($wrapElement) {
             foreach ($nodeList as $node) {
-                if ($node instanceof \DOMElement) {
-                    $result[] = new Element($node);
-
-                    continue;
-                }
-
-                if ($node instanceof \DOMText) {
-                    $result[] = $node->data;
-
-                    continue;
-                }
-
-                if ($node instanceof \DOMAttr) {
-                    $result[] = $node->value;
-
-                    continue;
-                }
-
-                throw new RuntimeException(sprintf('Unknown node type "%s"', get_class($node)));
+                $result[] = $this->wrapNode($node);
             }
         } else {
             foreach ($nodeList as $node) {
@@ -312,6 +309,42 @@ class Document
         }
 
         return $result;
+    }
+
+    /**
+     * Searches for an item in the DOM tree and returns first element or null.
+     * 
+     * @param string $expression XPath expression or a CSS selector
+     * @param string $type The type of the expression
+     * @param bool   $wrapElement Returns \DiDom\Element if true, otherwise \DOMElement
+     *
+     * @return \DiDom\Element|\DOMElement|null
+     */
+    public function first($expression, $type = Query::TYPE_CSS, $wrapElement = true)
+    {
+        $nodes = $this->find($expression, $type, false);
+
+        if (count($nodes) === 0) {
+            return null;
+        }
+
+        return $wrapElement ? $this->wrapNode($nodes[0]) : $nodes[0];
+    }
+
+    protected function wrapNode($node)
+    {
+        switch (get_class($node)) {
+            case 'DOMElement':
+                return new Element($node);
+
+            case 'DOMText':
+                return $node->data;
+
+            case 'DOMAttr':
+                return $node->value;
+        }
+
+        throw new RuntimeException(sprintf('Unknown node type "%s"', get_class($node)));
     }
 
     /**
@@ -334,7 +367,7 @@ class Document
      * 
      * @return string The document html
      */
-    public function html($options = 0)
+    public function html($options = LIBXML_NOEMPTYTAG)
     {
         return trim($this->document->saveXML($this->getElement(), $options));
     }
@@ -344,7 +377,7 @@ class Document
      * 
      * @param int $options Additional options
      * 
-     * @return string The document html
+     * @return string The document xml
      */
     public function xml($options = 0)
     {
@@ -360,6 +393,10 @@ class Document
      */
     public function format($format = true)
     {
+        if (!is_bool($format)) {
+            throw new InvalidArgumentException(sprintf('%s expects parameter 1 to be boolean, %s given', __METHOD__, gettype($format)));
+        }
+
         $this->document->formatOutput = $format;
 
         return $this;
@@ -390,10 +427,14 @@ class Document
             $element = $document->getElement();
         } else {
             if (!$document instanceof DOMDocument) {
-                throw new InvalidArgumentException(sprintf('Argument 1 passed to %s must be an instance of %s or %s, %s given', __METHOD__, __CLASS__, 'DOMDocument', (is_object($document) ? get_class($document) : gettype($document))));
+                throw new InvalidArgumentException(sprintf('Argument 1 passed to %s must be an instance of %s or DOMDocument, %s given', __METHOD__, __CLASS__, (is_object($document) ? get_class($document) : gettype($document))));
             }
 
             $element = $document->documentElement;
+        }
+
+        if ($element === null) {
+            return false;
         }
 
         return $this->getElement()->isSameNode($element);

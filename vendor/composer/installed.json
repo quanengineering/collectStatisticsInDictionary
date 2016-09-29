@@ -1,17 +1,17 @@
 [
     {
         "name": "imangazaliev/didom",
-        "version": "1.6.7",
-        "version_normalized": "1.6.7.0",
+        "version": "1.8",
+        "version_normalized": "1.8.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/Imangazaliev/DiDOM.git",
-            "reference": "8e29148bbb5c9f1d4ca8e1c4b882e0326a389201"
+            "reference": "e57fe9b98dce1a4b2a91158b7de0f24405745a50"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/Imangazaliev/DiDOM/zipball/8e29148bbb5c9f1d4ca8e1c4b882e0326a389201",
-            "reference": "8e29148bbb5c9f1d4ca8e1c4b882e0326a389201",
+            "url": "https://api.github.com/repos/Imangazaliev/DiDOM/zipball/e57fe9b98dce1a4b2a91158b7de0f24405745a50",
+            "reference": "e57fe9b98dce1a4b2a91158b7de0f24405745a50",
             "shasum": ""
         },
         "require": {
@@ -20,7 +20,7 @@
         "require-dev": {
             "phpunit/phpunit": "^4.8"
         },
-        "time": "2016-04-22 18:01:52",
+        "time": "2016-09-17 09:57:53",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -49,17 +49,17 @@
     },
     {
         "name": "box/spout",
-        "version": "v2.4.4",
-        "version_normalized": "2.4.4.0",
+        "version": "v2.6.0",
+        "version_normalized": "2.6.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/box/spout.git",
-            "reference": "e9cd7a397e91e4f6b624a37c3fb73ea605f08e90"
+            "reference": "3e0afd858f362e62eab5235e80608100fc867281"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/box/spout/zipball/e9cd7a397e91e4f6b624a37c3fb73ea605f08e90",
-            "reference": "e9cd7a397e91e4f6b624a37c3fb73ea605f08e90",
+            "url": "https://api.github.com/repos/box/spout/zipball/3e0afd858f362e62eab5235e80608100fc867281",
+            "reference": "3e0afd858f362e62eab5235e80608100fc867281",
             "shasum": ""
         },
         "require": {
@@ -69,18 +69,17 @@
             "php": ">=5.4.0"
         },
         "require-dev": {
-            "phpunit/phpunit": ">=3.7",
-            "scrutinizer/ocular": "~1.1"
+            "phpunit/phpunit": "^4.8.0"
         },
         "suggest": {
             "ext-iconv": "To handle non UTF-8 CSV files (if \"php-intl\" is not already installed or is too limited)",
             "ext-intl": "To handle non UTF-8 CSV files (if \"iconv\" is not already installed)"
         },
-        "time": "2016-04-12 18:03:15",
+        "time": "2016-09-08 00:04:31",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "2.5.x-dev"
+                "dev-master": "2.6.x-dev"
             }
         },
         "installation-source": "dist",

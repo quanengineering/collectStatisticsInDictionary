@@ -1,6 +1,6 @@
 # DiDOM
 
-[![Build Status](https://travis-ci.org/Imangazaliev/DiDOM.svg)](https://travis-ci.org/Imangazaliev/DiDOM)
+[![Build Status](https://codeship.com/projects/cf938980-36f0-0134-119e-36dc468776c7/status?branch=master)](https://codeship.com/projects/165662)
 [![Total Downloads](https://poser.pugx.org/imangazaliev/didom/downloads)](https://packagist.org/packages/imangazaliev/didom)
 [![Latest Stable Version](https://poser.pugx.org/imangazaliev/didom/v/stable)](https://packagist.org/packages/imangazaliev/didom)
 [![License](https://poser.pugx.org/imangazaliev/didom/license)](https://packagist.org/packages/imangazaliev/didom)
@@ -19,12 +19,17 @@ DiDOM - простая и быстрая библиотека для парси�
 - [Поддерживамые селекторы](#Поддерживамые-селекторы)
 - [Вывод содержимого](#Вывод-содержимого)
 - [Создание нового элемента](#Создание-нового-элемента)
-- [Получение родителя](#Получение-родителя)
+- [Получение родительского элемента](#Получение-родительского-элемента)
+- [Получение соседних элементов](#Получение-соседних-элементов)
+- [Получение дочерних элементов](#Получение-соседних-элементов)
+- [Получение документа](#Получение-документа)
 - [Работа с атрибутами элемента](#Работа-с-атрибутами-элемента)
 - [Сравнение элементов](#Сравнение-элементов)
+- [Добавление дочерних элементов](#Добавление-дочерних-элементов)
 - [Замена элемента](#Замена-элемента)
 - [Удаление элемента](#Удаление-элемента)
 - [Работа с кэшем](#Работа-с-кэшем)
+- [Прочее](#Прочее)
 - [Сравнение с другими парсерами](#Сравнение-с-другими-парсерами)
 
 ## Установка
@@ -105,6 +110,10 @@ $posts = $document->find('.post');
 $posts = $document->find("//div[contains(@class, 'post')]", Query::TYPE_XPATH);
 ```
 
+##### Через метод `first()`:
+
+Возвращает первый найденный элемент, либо `null`, если элементы, подходящие под селектор не были найдены.
+
 ##### Через магический метод `__invoke()`:
 
 ```php
@@ -164,6 +173,7 @@ DiDom поддерживает поиск по:
     - first-, last-, nth-child
     - empty и not-empty
     - contains
+    - has
 
 ```php
 // все ссылки
@@ -179,8 +189,11 @@ $document->find('*[name]');
 
 // поле ввода с именем "foo"
 $document->find('input[name=foo]');
-$document->find('input[name=\'bar\']');
-$document->find('input[name="baz"]');
+$document->find('input[name=\'foo\']');
+$document->find('input[name="foo"]');
+
+// поле ввода, название которого НЕ равно "foo"
+$document->find('input[name!="foo"]');
 
 // любой элемент, у которого есть атрибут,
 // начинающийся с "data-" и равный "foo"
@@ -194,6 +207,9 @@ $document->find('img[src$=png]');
 
 // все ссылки, содержащие в своем адресе строку "example.com"
 $document->find('a[href*=example.com]');
+
+// все ссылки, содержащие в атрибуте data-foo значение bar отделенное пробелом
+$document->find('a[data-foo~=bar]');
 
 // текст всех ссылок с классом "foo"
 $document->find('a.foo::text');
@@ -289,27 +305,75 @@ use DiDom\Element;
 use DOMElement;
 
 $domElement = new DOMElement('span', 'Hello');
-$element    = new Element($domElement);
+$element = new Element($domElement);
 ```
 
 ### С помощью метода `createElement`
 
 ```php
 $document = new Document($html);
-$element  = $document->createElement('span', 'Hello');
+$element = $document->createElement('span', 'Hello');
 ```
 
-## Получение родителя
+## Получение родительского элемента
 
 ```php
 $document = new Document($html);
-$element  = $document->find('input[name=email]')[0];
+$input = $document->first('input[name=email]');
 
-// получение родителя
-$parent = $element->parent();
+var_dump($input->parent());
+```
+
+## Получение соседних элементов
+
+```php
+$document = new Document($html);
+$item = $document->find('ul.menu > li')[1];
+
+// предыдущий элемент
+var_dump($item->previousSibling());
+
+// следующий элемент
+var_dump($item->nextSibling());
+```
+
+## Получение дочерних элементов
+
+```php
+$html = '
+<ul>
+    <li>Foo</li>
+    <li>Bar</li>
+    <li>Baz</li>
+</ul>
+';
+
+$document = new Document($html);
+$list = $document->first('ul');
+
+// string(3) "Baz"
+var_dump($item->child(2)->text());
+
+// string(3) "Foo"
+var_dump($item->firstChild()->text());
+
+// string(3) "Baz"
+var_dump($item->lastChild()->text());
+
+// array(3) { ... }
+var_dump($item->children());
+```
+
+## Получение документа
+
+```php
+$document = new Document($html);
+$element  = $document->first('input[name=email]');
+
+$document2 = $element->getDocument();
 
 // bool(true)
-var_dump($document->is($parent));
+var_dump($document->is($document2));
 ```
 
 ## Работа с атрибутами элемента
@@ -383,6 +447,12 @@ $element->removeAttribute('name');
 unset($element->name);
 ```
 
+#### Получение всех атрибутов:
+
+```php
+var_dump($element->attributes());
+```
+
 ## Сравнение элементов
 
 ```php
@@ -414,15 +484,35 @@ $list->appendChild($items);
 ## Замена элемента
 
 ```php
-$element = new Element('span', 'hello');
+$title = new Element('title', 'foo');
 
-$document->find('.post')[0]->replace($element);
+$document->first('title')->replace($title);
+```
+
+**Внимание:** заменить можно только те элементы, которые были найдены непосредственно в документе:
+
+```php
+// ничего не выйдет
+$document->first('head')->first('title')->replace($title);
+
+// а вот так да
+$document->first('head title')->replace($title);
 ```
 
 ## Удаление элемента
 
 ```php
-$document->find('.post')[0]->remove();
+$document->first('title')->remove();
+```
+
+**Внимание:** удалить можно только те элементы, которые были найдены непосредственно в документе:
+
+```php
+// ничего не выйдет
+$document->first('head')->first('title')->remove();
+
+// а вот так да
+$document->first('head title')->remove();
 ```
 
 ## Работа с кэшем
@@ -447,6 +537,22 @@ var_dump($compiled);
 
 ```php
 Query::setCompiled(['h2' => '//h2']);
+```
+
+## Прочее
+
+#### `preserveWhiteSpace`
+
+По умолчанию сохранение пробелов между тегами отключено.
+
+Включать опцию `preserveWhiteSpace` следует до загрузки документа:
+
+```php
+$document = new Document();
+
+$document->preserveWhiteSpace();
+
+$document->loadXml($xml);
 ```
 
 ## Сравнение с другими парсерами

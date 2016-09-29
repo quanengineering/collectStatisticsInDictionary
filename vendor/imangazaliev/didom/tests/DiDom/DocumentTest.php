@@ -318,6 +318,23 @@ class DocumentTest extends TestCase
         );
     }
 
+    public function testFirst()
+    {
+        $html = '<ul><li>One</li><li>Two</li><li>Three</li></ul>';
+
+        $document = new Document($html, false);
+
+        $items = $document->find('ul > li');
+
+        $this->assertEquals($items[0]->getNode(), $document->first('ul > li')->getNode());
+
+        $this->assertEquals('One', $document->first('ul > li::text'));
+
+        $document = new Document();
+
+        $this->assertNull($document->first('ul > li'));
+    }
+
     public function testXpath()
     {
         $html = $this->loadFixture('posts.html');
@@ -348,8 +365,8 @@ class DocumentTest extends TestCase
         $document = new Document();
         $document->loadHtml($html);
 
-        $this->assertEquals('<html><body><span/></body></html>', $document->html());
-        $this->assertEquals('<html><body><span></span></body></html>', $document->html(LIBXML_NOEMPTYTAG));
+        $this->assertEquals('<html><body><span></span></body></html>', $document->html());
+        $this->assertEquals('<html><body><span/></body></html>', $document->html(0));
     }
 
     public function testXml()
@@ -419,6 +436,16 @@ class DocumentTest extends TestCase
 
         $this->assertTrue($document->is($document));
         $this->assertFalse($document->is($document2));
+    }
+
+    public function testIsWithEmptyDocument()
+    {
+        $html = $this->loadFixture('posts.html');
+
+        $document = new Document($html, false);
+        $document2 = new Document();
+
+        $this->assertFalse($document->is($document2));        
     }
 
     public function testGetDocument()

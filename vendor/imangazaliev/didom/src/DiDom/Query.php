@@ -30,7 +30,7 @@ class Query
      */
     public static function compile($expression, $type = self::TYPE_CSS)
     {
-        if (strcasecmp($type, self::TYPE_XPATH) == 0) {
+        if (strcasecmp($type, self::TYPE_XPATH) === 0) {
             return $expression;
         }
 
@@ -64,18 +64,24 @@ class Query
      */
     public static function cssToXpath($selector, $prefix = '//')
     {
-        $segments = self::getSegments($selector);
-        $xpath = '';
-
         $pos = strrpos($selector, '::');
 
         if ($pos !== false) {
-            $property = substr($selector, $pos+2);
+            $property = substr($selector, $pos + 2);
             $property = self::parseProperty($property);
             $property = self::convertProperty($property['name'], $property['args']);
 
             $selector = substr($selector, 0, $pos);
         }
+
+        if (substr($selector, 0, 1) === '>') {
+            $prefix = '/';
+
+            $selector = ltrim($selector, '> ');
+        }
+
+        $segments = self::getSegments($selector);
+        $xpath = '';
 
         while (count($segments) > 0) {
             $xpath .= self::buildXpath($segments, $prefix);
@@ -155,6 +161,8 @@ class Query
      */
     public static function buildXpath($segments, $prefix = '//')
     {
+        $tagName = isset($segments['tag']) ? $segments['tag'] : '*';
+
         $attributes = array();
 
         // if the id attribute specified
@@ -179,14 +187,16 @@ class Query
         // if the pseudo class specified
         if (isset($segments['pseudo'])) {
             $expression   = isset($segments['expr']) ? trim($segments['expr']) : '';
-            $attributes[] = self::convertPseudo($segments['pseudo'], explode(',', $expression));
+
+            $parameters = explode(',', $expression);
+
+            $attributes[] = self::convertPseudo($segments['pseudo'], $parameters, $tagName);
         }
 
         if (count($attributes) === 0 and !isset($segments['tag'])) {
             throw new InvalidArgumentException('The array of segments should contain the name of the tag or at least one attribute');
         }
 
-        $tagName = isset($segments['tag']) ? $segments['tag'] : '*';
         $xpath = $prefix.$tagName;
 
         if ($count = count($attributes)) {
@@ -204,10 +214,20 @@ class Query
      */
     protected static function convertAttribute($name, $value)
     {
+        // if the attribute name starts with ^
+        // example: *[^data-]
         if (substr($name, 0, 1) === '^') {
             $xpath = sprintf('@*[starts-with(name(), "%s")]', substr($name, 1));
 
             return $value === null ? $xpath : sprintf('%s="%s"', $xpath, $value);
+        }
+
+        // if the attribute name starts with !
+        // example: input[!disabled]
+        if (substr($name, 0, 1) === '!') {
+            $xpath = sprintf('not(@%s)', substr($name, 1));
+
+            return $xpath;
         }
 
         switch (substr($name, -1)) {
@@ -219,6 +239,12 @@ class Query
                 break;
             case '*':
                 $xpath = sprintf('contains(@%s, "%s")', substr($name, 0, -1), $value);
+                break;
+            case '!':
+                $xpath = sprintf('not(@%s="%s")', substr($name, 0, -1), $value);
+                break;
+            case '~':
+                $xpath = sprintf('contains(concat(" ", normalize-space(@%s), " "), " %s ")', substr($name, 0, -1), $value);
                 break;
             default:
                 // if specified only the attribute name
@@ -234,12 +260,13 @@ class Query
      * 
      * @param string $pseudo Pseudo-class
      * @param string $parameters
+     * @param string $tagName
      *
      * @return string
      *
      * @throws \RuntimeException if passed an unknown pseudo-class
      */
-    protected static function convertPseudo($pseudo, $parameters = [])
+    protected static function convertPseudo($pseudo, $parameters = [], &$tagName)
     {
         switch ($pseudo) {
             case 'first-child':
@@ -248,14 +275,11 @@ class Query
             case 'last-child':
                 return 'position() = last()';
                 break;
-            case 'empty':
-                return 'count(descendant::*) = 0';
-                break;
-            case 'not-empty':
-                return 'count(descendant::*) > 0';
-                break;
             case 'nth-child':
-                return self::convertNthChildExpression($parameters[0]);
+                $xpath = sprintf('(name()="%s") and (%s)', $tagName, self::convertNthExpression($parameters[0]));
+                $tagName = '*';
+
+                return $xpath;
                 break;
             case 'contains':
                 $string = trim($parameters[0], ' \'"');
@@ -263,13 +287,28 @@ class Query
 
                 return self::convertContains($string, $caseSensetive);
                 break;
+            case 'has':
+                return self::cssToXpath($parameters[0], './/');
+                break;
+            case 'not':
+                return sprintf('not(self::%s)', self::cssToXpath($parameters[0], ''));
+                break;
+            case 'nth-of-type':
+                return self::convertNthExpression($parameters[0]);
+                break;
+            case 'empty':
+                return 'count(descendant::*) = 0';
+                break;
+            case 'not-empty':
+                return 'count(descendant::*) > 0';
+                break;
         }
 
         throw new RuntimeException('Invalid selector: unknown pseudo-class');
     }
 
     /**
-     * Converts nth-child expression into an XPath expression.
+     * Converts nth-expression into an XPath expression.
      * 
      * @param string $expression nth-expression
      * 
@@ -278,25 +317,31 @@ class Query
      * @throws \RuntimeException if passed nth-child is empty
      * @throws \RuntimeException if passed an unknown nth-child expression
      */
-    protected static function convertNthChildExpression($expression)
+    protected static function convertNthExpression($expression)
     {
         if ($expression === '') {
-            throw new RuntimeException('Invalid selector: nth-child expression must not be empty');
+            throw new RuntimeException('Invalid selector: nth-child (or nth-last-child) expression must not be empty');
         }
 
         if ($expression === 'odd') {
-            return '(position() -1) mod 2 = 0 and position() >= 1';
-        } elseif ($expression === 'even') {
-            return 'position() mod 2 = 0 and position() >= 0';
-        } elseif (is_numeric($expression)) {
-            return sprintf('position() = %d', $expression);
-        } elseif (preg_match("/^(?P<mul>[0-9]?n)(?:(?P<sign>\+|\-)(?P<pos>[0-9]+))?$/is", $expression, $segments)) {
-            if (isset($segments['mul'])) {
-                $segments['mul'] = strtolower($segments['mul'] === 'n') ? 1 : trim(strtolower($segments['mul']), 'n');
-                $segments['sign'] = (isset($segments['sign']) and $segments['sign'] === '+') ? '-' : '+';
-                $segments['pos'] = isset($segments['pos']) ? $segments['pos'] : 0;
+            return 'position() mod 2 = 1 and position() >= 1';
+        }
 
-                return sprintf('(position() %s %d) mod %d = 0 and position() >= %d', $segments['sign'], $segments['pos'], $segments['mul'], $segments['pos']);
+        if ($expression === 'even') {
+            return 'position() mod 2 = 0 and position() >= 0';
+        }
+
+        if (is_numeric($expression)) {
+            return sprintf('position() = %d', $expression);
+        }
+
+        if (preg_match("/^(?P<mul>[0-9]?n)(?:(?P<sign>\+|\-)(?P<pos>[0-9]+))?$/is", $expression, $segments)) {
+            if (isset($segments['mul'])) {
+                $multiplier = $segments['mul'] === 'n' ? 1 : trim($segments['mul'], 'n');
+                $sign = (isset($segments['sign']) and $segments['sign'] === '+') ? '-' : '+';
+                $position = isset($segments['pos']) ? $segments['pos'] : 0;
+
+                return sprintf('(position() %s %d) mod %d = 0 and position() >= %d', $sign, $position, $multiplier, $position);
             }
         }
 
@@ -352,6 +397,10 @@ class Query
         $regexp = '/'.$tag.$id.$classes.$attrs.$pseudo.$rel.'/is';
 
         if (preg_match($regexp, $selector, $segments)) {
+            if ($segments[0] === '') {
+                throw new RuntimeException('Invalid selector');
+            }
+
             $result['selector'] = $segments[0];
             $result['tag']      = (isset($segments['tag']) and $segments['tag'] !== '') ? $segments['tag'] : '*';
 

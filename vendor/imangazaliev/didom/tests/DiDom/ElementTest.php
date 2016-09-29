@@ -10,6 +10,22 @@ use DiDom\Query;
 class ElementTest extends TestCase
 {
     /**
+     * @expectedException PHPUnit_Framework_Error
+     */
+    public function testConstructorWithInvalidName()
+    {
+        new Element(null, 'hello');
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    public function testConstructorWithInvalidValue()
+    {
+        new Element('span', []);
+    }
+
+    /**
      * @expectedException InvalidArgumentException
      */
     public function testConstructorWithInvalidAttributes()
@@ -19,16 +35,13 @@ class ElementTest extends TestCase
 
     public function testConstructor()
     {
-        $element = new Element('input', '', ['name' => 'username', 'value' => 'John']);
+        $element = new Element('input', null, ['name' => 'username', 'value' => 'John']);
 
         $this->assertEquals('input', $element->getNode()->tagName);
-        $this->assertEquals('', $element->getNode()->textContent);
         $this->assertEquals('username', $element->getNode()->getAttribute('name'));
         $this->assertEquals('John', $element->getNode()->getAttribute('value'));
-    }
 
-    public function testCreateFromDomElement()
-    {
+        // create from DOMElement
         $node = $this->createNode('input');
         $element = new Element($node);
 
@@ -96,6 +109,23 @@ class ElementTest extends TestCase
         foreach ($elements as $element) {
             $this->assertInstanceOf('DiDom\Element', $element);
         }
+    }
+
+    public function testFirst()
+    {
+        $html = '<ul><li>One</li><li>Two</li><li>Three</li></ul>';
+
+        $document = new Document($html, false);
+
+        $list = $document->first('ul');
+
+        $item = $list->getNode()->childNodes->item(0);
+
+        $this->assertEquals($item, $list->first('li')->getNode());
+
+        $list = new Element('ul');
+
+        $this->assertNull($list->first('li'));
     }
 
     /**
@@ -194,35 +224,38 @@ class ElementTest extends TestCase
 
     public function testRemoveAttribute()
     {
-        $node = $this->createNode('input');
-        $node->setAttribute('value', 'test');
-        $element = new Element($node);
+        $element = new Element('input', null, ['name' => 'username']);
 
-        $this->assertTrue($element->hasAttribute('value'));
+        $this->assertTrue($element->hasAttribute('name'));
 
-        $element->removeAttribute('value');
+        $element->removeAttribute('name');
 
-        $this->assertFalse($element->hasAttribute('value'));
+        $this->assertFalse($element->hasAttribute('name'));
     }
 
     public function testAttrSet()
     {
-        $node = $this->createNode('input');
+        $element = new Element('input');
 
-        $element = new Element($node);
-        $element->attr('value', 'test');
+        $element->attr('name', 'username');
 
-        $this->assertEquals('test', $element->getNode()->getAttribute('value'));
+        $this->assertEquals('username', $element->getNode()->getAttribute('name'));
     }
 
     public function testAttrGet()
     {
-        $node = $this->createNode('input');
-        $node->setAttribute('value', 'test');
+        $element = new Element('input', null, ['name' => 'username']);
 
-        $element = new Element($node);
+        $this->assertEquals('username', $element->attr('name'));
+    }
 
-        $this->assertEquals('test', $element->attr('value'));
+    public function testAttributes()
+    {
+        $attributes = ['type' => 'text', 'name' => 'username'];
+
+        $element = new Element('input', null, $attributes);
+
+        $this->assertEquals($attributes, $element->attributes());
     }
 
     public function testHtml()
@@ -249,8 +282,8 @@ class ElementTest extends TestCase
 
         $element = $document->find('span')[0];
 
-        $this->assertEquals('<span/>', $element->html());
-        $this->assertEquals('<span></span>', $element->html(LIBXML_NOEMPTYTAG));
+        $this->assertEquals('<span></span>', $element->html());
+        $this->assertEquals('<span/>', $element->html(0));
     }
 
     public function testXml()
@@ -279,8 +312,7 @@ class ElementTest extends TestCase
 
     public function testGetText()
     {
-        $node = $this->createNode('span', 'hello');
-        $element = new Element($node);
+        $element = new Element('span', 'hello');
 
         $this->assertEquals('hello', $element->text());
     }
@@ -317,7 +349,175 @@ class ElementTest extends TestCase
         $document = new Document($html, false);
         $element = $document->createElement('span', 'value');
 
-        $this->assertEquals($document->getDocument(), $element->parent()->getDocument());
+        $this->assertEquals($document->getDocument(), $element->getDocument()->getDocument());
+    }
+
+    public function testPreviousSibling()
+    {
+        $html = '<ul><li>One</li><li>Two</li><li>Three</li></ul>';
+
+        $document = new Document($html, false);
+
+        $list = $document->first('ul');
+
+        $item = $list->getNode()->childNodes->item(1);
+        $item = new Element($item);
+
+        $previousSibling = $list->getNode()->childNodes->item(0);
+
+        $this->assertEquals($previousSibling, $item->previousSibling()->getNode());
+
+        $item = $list->getNode()->childNodes->item(0);
+        $item = new Element($item);
+
+        $this->assertNull($item->previousSibling());
+
+        // with text nodes
+        $html = '<p>Foo <span>Bar</span> Baz</p>';
+
+        $document = new Document($html, false);
+
+        $paragraph = $document->first('p');
+        $span = $paragraph->first('span');
+
+        $previousSibling = $span->getNode()->previousSibling;
+
+        $this->assertEquals($previousSibling, $span->previousSibling()->getNode());
+    }
+
+    public function testNextSibling()
+    {
+        $html = '<ul><li>One</li><li>Two</li><li>Three</li></ul>';
+
+        $document = new Document($html, false);
+
+        $list = $document->first('ul');
+
+        $item = $list->getNode()->childNodes->item(0);
+        $item = new Element($item);
+
+        $nextSibling = $list->getNode()->childNodes->item(1);
+
+        $this->assertEquals($nextSibling, $item->nextSibling()->getNode());
+
+        $item = $list->getNode()->childNodes->item(2);
+        $item = new Element($item);
+
+        $this->assertNull($item->nextSibling());
+
+        // with text nodes
+        $html = '<p>Foo <span>Bar</span> Baz</p>';
+
+        $document = new Document($html, false);
+
+        $paragraph = $document->first('p');
+        $span = $paragraph->first('span');
+
+        $nextSibling = $span->getNode()->nextSibling;
+
+        $this->assertEquals($nextSibling, $span->nextSibling()->getNode());
+    }
+
+    public function testChild()
+    {
+        $html = '<ul><li>One</li><li>Two</li><li>Three</li></ul>';
+
+        $document = new Document($html, false);
+
+        $list = $document->first('ul');
+
+        $this->assertEquals($list->getNode()->childNodes->item(0), $list->child(0)->getNode());
+        $this->assertEquals($list->getNode()->childNodes->item(2), $list->child(2)->getNode());
+        $this->assertNull($list->child(3));
+
+        // with text nodes
+        $html = '<p>Foo <span>Bar</span> Baz</p>';
+
+        $document = new Document($html, false);
+
+        $paragraph = $document->first('p');
+
+        $child = $paragraph->getNode()->childNodes->item(0);
+
+        $this->assertEquals($child, $paragraph->child(0)->getNode());
+    }
+
+    public function testFirstChild()
+    {
+        $html = '<ul><li>One</li><li>Two</li><li>Three</li></ul>';
+
+        $document = new Document($html, false);
+
+        $list = $document->first('ul');
+
+        $this->assertEquals($list->getNode()->firstChild, $list->firstChild()->getNode());
+
+        $list = new Element('ul');
+
+        $this->assertNull($list->firstChild());
+
+        // with text nodes
+        $html = '<p>Foo <span>Bar</span> Baz</p>';
+
+        $document = new Document($html, false);
+
+        $paragraph = $document->first('p');
+
+        $firstChild = $paragraph->getNode()->firstChild;
+
+        $this->assertEquals($firstChild, $paragraph->firstChild()->getNode());
+    }
+
+    public function testLastChild()
+    {
+        $html = '<ul><li>One</li><li>Two</li><li>Three</li></ul>';
+
+        $document = new Document($html, false);
+        $list = $document->first('ul');
+
+        $this->assertEquals($list->getNode()->lastChild, $list->lastChild()->getNode());
+
+        $list = new Element('ul');
+
+        $this->assertNull($list->lastChild());
+
+        // with text nodes
+        $html = '<p>Foo <span>Bar</span> Baz</p>';
+
+        $document = new Document($html, false);
+        $paragraph = $document->first('p');
+
+        $lastChild = $paragraph->getNode()->lastChild;
+
+        $this->assertEquals($lastChild, $paragraph->lastChild()->getNode());
+    }
+
+    public function testChildren()
+    {
+        $html = '<ul><li>One</li><li>Two</li><li>Three</li></ul>';
+
+        $document = new Document($html, false);
+
+        $list = $document->first('ul');
+
+        $children = $list->children();
+
+        foreach ($list->getNode()->childNodes as $index => $node) {
+            $this->assertEquals($node, $children[$index]->getNode());
+        }
+
+        // with text nodes
+        $html = '<p>Foo <span>Bar</span> Baz</p>';
+
+        $document = new Document($html, false);
+
+        $paragraph = $document->first('p');
+
+        $children = $paragraph->children();
+
+        foreach ($paragraph->getNode()->childNodes as $index => $node) {
+            $this->assertEquals($node, $children[$index]->getNode());
+        }
     }
 
     public function testParentWithoutOwner()
@@ -359,6 +559,21 @@ class ElementTest extends TestCase
         $this->assertEquals($first->getNode(), $first->replace($third, false)->getNode());
         $this->assertEquals($third->getNode(), $document->find('li')[0]->getNode());
         $this->assertCount(2, $document->find('li'));
+    }
+
+    public function testReplaceToNewElement()
+    {
+        $html = '<ul><li>One</li><li>Two</li><li>Three</li></ul>';
+
+        $document = new Document($html, false);
+
+        $first = $document->find('li')[0];
+
+        $newElement = new Element('li', 'Foo');
+
+        $this->assertEquals($first->getNode(), $first->replace($newElement)->getNode());
+        $this->assertEquals('Foo', $document->find('li')[0]->text());
+        $this->assertCount(3, $document->find('li'));
     }
 
     public function testReplaceWithDifferentDocuments()
@@ -403,10 +618,19 @@ class ElementTest extends TestCase
         $this->assertEquals($node, $element->getNode());
     }
 
+    public function testGetDocument()
+    {
+        $html = $this->loadFixture('posts.html');
+
+        $document = new Document($html, false);
+        $element = $document->createElement('span', 'value');
+
+        $this->assertEquals($document->getDocument(), $element->getDocument()->getDocument());
+    }
+
     public function testToDocument()
     {
-        $node = $this->createNode('input');
-        $element = new Element($node);
+        $element = new Element('input');
 
         $document = $element->toDocument();
 
@@ -423,19 +647,16 @@ class ElementTest extends TestCase
         $node = $this->createNode('input');
 
         $element = new Element($node);
-        $element->value = 'test';
+        $element->name = 'username';
 
-        $this->assertEquals('test', $element->getNode()->getAttribute('value'));
+        $this->assertEquals('username', $element->getNode()->getAttribute('name'));
     }
 
     public function testGetMagicMethod()
     {
-        $node = $this->createNode('input');
-        $node->setAttribute('value', 'test');
+        $element = new Element('input', null, ['name' => 'username']);
 
-        $element = new Element($node);
-
-        $this->assertEquals('test', $element->value);
+        $this->assertEquals('username', $element->name);
     }
 
     public function testIssetMagicMethod()
@@ -453,15 +674,13 @@ class ElementTest extends TestCase
 
     public function testUnsetMagicMethod()
     {
-        $node = $this->createNode('input');
-        $node->setAttribute('value', 'test');
+        $element = new Element('input', null, ['name' => 'username']);
 
-        $element = new Element($node);
+        $this->assertTrue($element->hasAttribute('name'));
 
-        $this->assertTrue($element->hasAttribute('value'));
+        unset($element->name);
 
-        unset($element->value);
-        $this->assertFalse($element->hasAttribute('value'));
+        $this->assertFalse($element->hasAttribute('name'));
     }
 
     public function testToString()

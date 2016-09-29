@@ -3,6 +3,7 @@
 namespace DiDom;
 
 use DOMDocument;
+use DOMNode;
 use DOMElement;
 use InvalidArgumentException;
 
@@ -11,14 +12,14 @@ class Element
     /**
      * The DOM element instance.
      * 
-     * @var \DOMElement;
+     * @var \DOMNode;
      */
     protected $node;
 
     /**
      * Constructor.
      * 
-     * @param \DOMElement|string $name The tag name of the element
+     * @param \DOMNode|string $name The tag name of the element
      * @param string $value The value of the element
      * @param array  $attributes The attributes of the element
      *
@@ -27,6 +28,7 @@ class Element
     public function __construct($name, $value = '', $attributes = [])
     {
         $document = new DOMDocument('1.0', 'UTF-8');
+
         $node = is_string($name) ? $document->createElement($name, $value) : $name;
 
         $this->setNode($node);
@@ -62,18 +64,14 @@ class Element
                 throw new InvalidArgumentException(sprintf('Argument 1 passed to %s must be an instance of %s\Element or DOMNode, %s given', __METHOD__, __NAMESPACE__, (is_object($node) ? get_class($node) : gettype($node))));
             }
 
-            libxml_use_internal_errors(true);
-            libxml_disable_entity_loader(true);
+            Errors::disable();
 
             $cloned = $node->cloneNode(true);
             $newNode = $this->node->ownerDocument->importNode($cloned, true);
 
             $this->node->appendChild($newNode);
 
-            libxml_clear_errors();
-
-            libxml_disable_entity_loader(false);
-            libxml_use_internal_errors(false);
+            Errors::restore();
         }
 
         return $this;
@@ -104,6 +102,20 @@ class Element
     public function find($expression, $type = Query::TYPE_CSS, $wrapElement = true)
     {
         return $this->toDocument()->find($expression, $type, $wrapElement);
+    }
+
+    /**
+     * Searches for an item in the DOM tree and returns first element or null.
+     * 
+     * @param string $expression XPath expression or a CSS selector
+     * @param string $type The type of the expression
+     * @param bool   $wrapElement Returns \DiDom\Element if true, otherwise \DOMElement
+     *
+     * @return \DiDom\Element|\DOMElement|null
+     */
+    public function first($expression, $type = Query::TYPE_CSS, $wrapElement = true)
+    {
+        return $this->toDocument()->first($expression, $type, $wrapElement);
     }
 
     /**
@@ -195,13 +207,33 @@ class Element
     }
 
     /**
+     * Returns the node attributes or null, if it is not DOMElement.
+     * 
+     * @return array|null
+     */
+    public function attributes()
+    {
+        if (!$this->node instanceof DOMElement) {
+            return null;
+        }
+
+        $attributes = [];
+
+        foreach ($this->node->attributes as $name => $attr) {
+            $attributes[$name] = $attr->value;
+        }
+
+        return $attributes;
+    }
+
+    /**
      * Dumps the node into a string using HTML formatting.
      * 
      * @param int $options Additional options
      * 
      * @return string The node HTML
      */
-    public function html($options = 0)
+    public function html($options = LIBXML_NOEMPTYTAG)
     {
         return $this->toDocument()->html($options);
     }
@@ -213,19 +245,53 @@ class Element
      * 
      * @return string
      */
-    public function innerHtml($options = 0)
+    public function innerHtml($options = LIBXML_NOEMPTYTAG)
     {
-        $childrenHtml = [];
-        $children = $this->node->childNodes;
+        $innerHtml = [];
+        $childNodes = $this->node->childNodes;
 
-        foreach ($children as $child) 
+        foreach ($childNodes as $node) 
         {
-            $childrenHtml[] = $child->ownerDocument->saveXml($child, $options);
+            $innerHtml[] = $node->ownerDocument->saveXml($node, $options);
         }
 
-        $html = implode('', $childrenHtml);
+        return implode('', $innerHtml);
+    }
 
-        return $html;
+    /**
+     * Sets inner HTML.
+     * 
+     * @param string $html
+     */
+    public function setInnerHtml($html)
+    {
+        if (!is_string($html)) {
+            throw new InvalidArgumentException(sprintf('%s expects parameter 1 to be string, %s given', __METHOD__, (is_object($html) ? get_class($html) : gettype($html))));
+        }
+
+        // remove all child nodes
+        foreach ($this->node->childNodes as $node) 
+        {
+            $this->node->removeChild($node);
+        }
+
+        if ($html !== '') {
+            Errors::disable();
+
+            $html = "<htmlfragment>$html</htmlfragment>";
+
+            $document = new Document($html);
+
+            $fragment = $document->first('htmlfragment')->getNode();
+
+            foreach ($fragment->childNodes as $node) {
+                $newNode = $this->node->ownerDocument->importNode($node, true);
+
+                $this->node->appendChild($newNode);
+            }
+
+            Errors::restore();
+        }
     }
 
     /**
@@ -271,11 +337,11 @@ class Element
     /**
      * Indicates if two nodes are the same node.
      * 
-     * @param \DiDom\Element|\DOMElement $node
+     * @param \DiDom\Element|\DOMNode $node
      *
      * @return bool
      *
-     * @throws \InvalidArgumentException if the provided argument is not an instance of \DOMElement
+     * @throws \InvalidArgumentException if the provided argument is not an instance of \DOMNode
      */
     public function is($node)
     {
@@ -283,23 +349,96 @@ class Element
             $node = $node->getNode();
         }
 
-        if (!$node instanceof \DOMElement) {
-            throw new InvalidArgumentException(sprintf('Argument 1 passed to %s must be an instance of %s or DOMElement, %s given', __METHOD__, __CLASS__, (is_object($node) ? get_class($node) : gettype($node))));
+        if (!$node instanceof DOMNode) {
+            throw new InvalidArgumentException(sprintf('Argument 1 passed to %s must be an instance of %s or DOMNode, %s given', __METHOD__, __CLASS__, (is_object($node) ? get_class($node) : gettype($node))));
         }
 
         return $this->node->isSameNode($node);
     }
 
     /**
-     * Returns the parent of this node.
-     * 
-     * @return \DiDom\Document the parent of this node
+     * @return \DiDom\Element|null
      */
     public function parent()
     {
-        if ($this->node->ownerDocument !== null) {
-            return new Document($this->node->ownerDocument);
+        if ($this->node->parentNode === null) {
+            return null;
         }
+
+        return new Element($this->node->parentNode);
+    }
+
+    /**
+     * @return \DiDom\Element|null
+     */
+    public function previousSibling()
+    {
+        if ($this->node->previousSibling === null) {
+            return null;
+        }
+
+        return new Element($this->node->previousSibling);
+    }
+
+    /**
+     * @return \DiDom\Element|null
+     */
+    public function nextSibling()
+    {
+        if ($this->node->nextSibling === null) {
+            return null;
+        }
+
+        return new Element($this->node->nextSibling);
+    }
+
+    /**
+     * @return \DiDom\Element|null
+     */
+    public function child($index)
+    {
+        $child = $this->node->childNodes->item($index);
+
+        return $child === null ? null : new Element($child);
+    }
+
+    /**
+     * @return \DiDom\Element|null
+     */
+    public function firstChild()
+    {
+        if ($this->node->firstChild === null) {
+            return null;
+        }
+
+        return new Element($this->node->firstChild);
+    }
+
+    /**
+     * @return \DiDom\Element|null
+     */
+    public function lastChild()
+    {
+        if ($this->node->lastChild === null) {
+            return null;
+        }
+
+        return new Element($this->node->lastChild);
+    }
+
+    /**
+     * @return \DiDom\Element[]
+     */
+    public function children()
+    {
+        $children = [];
+
+        foreach ($this->node->childNodes as $node) 
+        {
+            $children[] = new Element($node);
+        }
+
+        return $children;
     }
 
     /**
@@ -317,7 +456,7 @@ class Element
     /**
      * Replaces a child.
      * 
-     * @param \DOMElement|\DiDom\Element $newChild The new node
+     * @param \DOMNode|\DiDom\Element $newChild The new node
      * @param bool $clone Clone the node if true, otherwise move it
      * 
      * @return \DiDom\Element The node that has been replaced
@@ -328,15 +467,15 @@ class Element
             $newNode = $newNode->getNode();
         }
 
-        if (!$newNode instanceof \DOMElement) {
-            throw new InvalidArgumentException(sprintf('Argument 1 passed to %s must be an instance of %s or DOMElement, %s given', __METHOD__, __CLASS__, (is_object($newNode) ? get_class($newNode) : gettype($newNode))));
+        if (!$newNode instanceof DOMNode) {
+            throw new InvalidArgumentException(sprintf('Argument 1 passed to %s must be an instance of %s or DOMNode, %s given', __METHOD__, __CLASS__, (is_object($newNode) ? get_class($newNode) : gettype($newNode))));
         }
 
         if ($clone) {
             $newNode = $newNode->cloneNode(true);
         }
 
-        if (!$this->parent()->is($newNode->ownerDocument)) {
+        if (!$this->getDocument()->is($newNode->ownerDocument)) {
             $newNode = $this->node->ownerDocument->importNode($newNode, true);
         }
 
@@ -358,13 +497,13 @@ class Element
     }
 
     /**
-     * Sets current \DOMElement instance.
+     * Sets current \DOMNode instance.
      *
-     * @param \DOMElement $node
+     * @param \DOMNode $node
      *
      * @return \DiDom\Element
      */
-    protected function setNode(\DOMElement $node)
+    protected function setNode(DOMNode $node)
     {
         $this->node = $node;
 
@@ -372,13 +511,27 @@ class Element
     }
 
     /**
-     * Get current \DOMElement instance.
+     * Get current \DOMNode instance.
      * 
-     * @return \DOMElement
+     * @return \DOMNode
      */
     public function getNode()
     {
         return $this->node;
+    }
+
+    /**
+     * Returns the document associated with this node.
+     * 
+     * @return \DiDom\Document|null
+     */
+    public function getDocument()
+    {
+        if ($this->node->ownerDocument === null) {
+            return null;
+        }
+
+        return new Document($this->node->ownerDocument);
     }
 
     /**

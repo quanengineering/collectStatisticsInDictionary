@@ -1,6 +1,6 @@
 # DiDOM
 
-[![Build Status](https://travis-ci.org/Imangazaliev/DiDOM.svg)](https://travis-ci.org/Imangazaliev/DiDOM)
+[![Build Status](https://codeship.com/projects/cf938980-36f0-0134-119e-36dc468776c7/status?branch=master)](https://codeship.com/projects/165662)
 [![Total Downloads](https://poser.pugx.org/imangazaliev/didom/downloads)](https://packagist.org/packages/imangazaliev/didom)
 [![Latest Stable Version](https://poser.pugx.org/imangazaliev/didom/v/stable)](https://packagist.org/packages/imangazaliev/didom)
 [![License](https://poser.pugx.org/imangazaliev/didom/license)](https://packagist.org/packages/imangazaliev/didom)
@@ -20,8 +20,12 @@ DiDOM - simple and fast HTML parser.
 - [Output](#output)
 - [Creating a new element](#creating-a-new-element)
 - [Getting parent element](#getting-parent-element)
+- [Getting sibling elements](#getting-sibling-elements)
+- [Getting the child elements](#getting-the-child-elements)
+- [Getting document](#getting-document)
 - [Working with element attributes](#working-with-element-attributes)
 - [Comparing elements](#comparing-elements)
+- [Adding a child element](#adding-a-child-element)
 - [Replacing element](#replacing-element)
 - [Removing element](#removing-element)
 - [Working with cache](#working-with-cache)
@@ -164,6 +168,7 @@ DiDom supports search by:
     - first-, last-, nth-child
     - empty and not-empty
     - contains
+    - has
 
 ```php
 // all links
@@ -301,13 +306,59 @@ $element  = $document->createElement('span', 'Hello');
 
 ```php
 $document = new Document($html);
+$input = $document->find('input[name=email]')[0];
+
+var_dump($input->parent());
+```
+
+## Getting sibling elements
+
+```php
+$document = new Document($html);
+$item = $document->find('ul.menu > li')[1];
+
+var_dump($item->previousSibling());
+
+var_dump($item->nextSibling());
+```
+
+## Getting the child elements
+
+```php
+$html = '
+<ul>
+    <li>Foo</li>
+    <li>Bar</li>
+    <li>Baz</li>
+</ul>
+';
+
+$document = new Document($html);
+$list = $document->first('ul');
+
+// string(3) "Baz"
+var_dump($item->child(2)->text());
+
+// string(3) "Foo"
+var_dump($item->firstChild()->text());
+
+// string(3) "Baz"
+var_dump($item->lastChild()->text());
+
+// array(3) { ... }
+var_dump($item->children());
+```
+
+## Getting document
+
+```php
+$document = new Document($html);
 $element  = $document->find('input[name=email]')[0];
 
-// getting parent
-$parent = $element->parent();
+$document2 = $element->getDocument();
 
 // bool(true)
-var_dump($document->is($parent));
+var_dump($document->is($document2));
 ```
 
 ## Working with element attributes
@@ -409,6 +460,21 @@ $list->appendChild($item);
 $list->appendChild($items);
 ```
 
+## Adding a child element
+
+```php
+$list = new Element('ul');
+
+$item = new Element('li', 'Item 1');
+$items = [
+    new Element('li', 'Item 2'),
+    new Element('li', 'Item 3'),
+];
+
+$list->appendChild($item);
+$list->appendChild($items);
+```
+
 ## Replacing element
 
 ```php
@@ -444,4 +510,4 @@ Query::setCompiled(['h2' => '//h2']);
 
 ## Comparison with other parsers
 
-[Comparison with other parsers](https://github.com/Imangazaliev/DiDOM/wiki/Comparison-with-other-parsers-(1.6.3))
+[Comparison with other parsers](https://github.com/Imangazaliev/DiDOM/wiki/Comparison-with-other-parsers-(1.0))
